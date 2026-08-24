@@ -1,0 +1,4 @@
+interface:
+  display_name: "SHEIN & Temu Scraper"
+  short_description: "Retrieve resilient product data from SHEIN and Temu"
+  default_prompt: "Use $scrape-shein-temu to find products and return validated structured data."
