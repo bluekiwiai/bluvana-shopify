@@ -17,6 +17,10 @@ Working repository for Bluvana's Shopify storefronts, product operations, brand 
 
 The original course site, course videos, local caches, and generated archives are intentionally not part of this repository.
 
+## Public contributions
+
+Anyone with a GitHub account can fork this repository, upload files, and open a pull request. Direct pushes remain limited to approved collaborators, as required by GitHub. See `CONTRIBUTING.md` for the browser and command-line workflows.
+
 ## Cofounder setup
 
 ### 1. Get access
