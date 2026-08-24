@@ -1,0 +1,59 @@
+{{ 'silk-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'silk-home.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Similar items. Shopify's `recommendations` object only populates on the
+  recommendations endpoint, so this reads the product's own collection and
+  falls back to placeholders. for/else avoids any .size comparison.
+{%- endcomment -%}
+{% liquid
+  assign shop_url = routes.all_products_collection_url
+  assign pool = product.collections.first.products
+%}
+
+<section class="sk-rail" aria-label="{{ section.settings.title | default: 'You may also like' | escape }}" data-sk-rail data-rail-id="recs">
+  <div class="sk-rail__in">
+    <div class="sk-head2">
+      <h2 class="sk-disp sk-head2__t">{{ section.settings.title | default: 'You may also like' }}</h2>
+    </div>
+  </div>
+
+  <div class="sk-rail__viewport">
+    <button class="sk-rail__arrow sk-rail__arrow--prev" type="button" data-sk-rail-prev aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+    </button>
+
+    <div class="sk-rail__track" data-sk-rail-track>
+      {%- for pass in (1..2) -%}
+        {%- for item in pool limit: 12 -%}
+          {%- unless item.id == product.id -%}
+            <div class="sk-rail__cell" {% if pass == 2 %}aria-hidden="true"{% endif %}>
+              {% render 'silk-product-card', product: item %}
+            </div>
+          {%- endunless -%}
+        {%- else -%}
+          {%- if pass == 1 -%}
+            <p class="sk-rail__none">No products found.</p>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+
+    <button class="sk-rail__arrow sk-rail__arrow--next" type="button" data-sk-rail-next aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+</section>
+
+{% schema %}
+{
+  "name": "Silk recommendations",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "You may also like" },
+    { "type": "text", "id": "cta", "label": "Button label", "default": "Shop everything" },
+    { "type": "url", "id": "link", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Silk recommendations" }]
+}
+{% endschema %}

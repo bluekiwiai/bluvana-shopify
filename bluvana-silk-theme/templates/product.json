@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "main": {
+      "type": "silk-product",
+      "settings": {
+        "lede": "Heavyweight mulberry silk, cut with French seams and finished by hand.",
+        "show_size_chart": true
+      }
+    },
+    "recs": {
+      "type": "silk-recs",
+      "settings": {
+        "title": "You may also like"
+      }
+    },
+    "reviews": {
+      "type": "silk-reviews",
+      "settings": {
+        "title": "What buyers said",
+        "seed": "[{\"rating\": 5, \"title\": \"It actually has weight to it\", \"body\": \"I have bought three silk sets before and sent two back. This one hangs like the photos instead of clinging. Washed it twice already on cold and it still looks new.\", \"name\": \"Priya R.\", \"verified\": true, \"date\": \"2026-08-02\", \"photos\": [], \"meta\": \"Size M, Rouge\"}, {\"rating\": 5, \"title\": \"Bought it for our anniversary\", \"body\": \"The colors genuinely match between the two sets, which sounds obvious until you have been sent two different reds by someone else. Boxed beautifully.\", \"name\": \"Daniel M.\", \"verified\": true, \"date\": \"2026-07-28\", \"photos\": [], \"meta\": \"Size L, Rouge\"}, {\"rating\": 4, \"title\": \"Runs slightly large\", \"body\": \"Lovely fabric and the lace is not scratchy at all. I am normally a small and the small was roomy. Would size down next time.\", \"name\": \"Simone A.\", \"verified\": true, \"date\": \"2026-07-19\", \"photos\": [], \"meta\": \"Size S, Ivory\"}, {\"rating\": 5, \"title\": \"Machine washable and it survived\", \"body\": \"I always thought silk meant dry cleaning only, so I was nervous. Cold cycle, mesh bag, line dried. Zero damage after six weeks of weekly washes.\", \"name\": \"Hannah T.\", \"verified\": true, \"date\": \"2026-07-11\", \"photos\": [], \"meta\": \"Size M, Bone\"}, {\"rating\": 5, \"title\": \"Worth the money\", \"body\": \"Cheaper sets pill after a month. This has not pilled at all and the shine has not gone flat, which is what usually gives away a cheap satin.\", \"name\": \"Elena V.\", \"verified\": true, \"date\": \"2026-06-30\", \"photos\": [], \"meta\": \"Size XS, Charcoal\"}, {\"rating\": 3, \"title\": \"Beautiful but the shorts are short\", \"body\": \"No complaints on the fabric or the finish, the seams are genuinely well done. The shorts are just shorter than they look on the model. The top is perfect.\", \"name\": \"Marta K.\", \"verified\": false, \"date\": \"2026-06-22\", \"photos\": [], \"meta\": \"Size L, Rouge\"}, {\"rating\": 5, \"title\": \"Second one I have ordered\", \"body\": \"Bought the ivory first, came back for the pine. Same weight, same finish, and the colors are both exactly what the site showed.\", \"name\": \"Josephine L.\", \"verified\": true, \"date\": \"2026-06-14\", \"photos\": [], \"meta\": \"Size M, Pine\"}, {\"rating\": 4, \"title\": \"Gift that landed well\", \"body\": \"Sent it to my sister for her birthday. The box it arrives in does a lot of work, no invoice inside which I appreciated.\", \"name\": \"Aiko S.\", \"verified\": true, \"date\": \"2026-06-03\", \"photos\": [], \"meta\": \"Size S, Ivory\"}]"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "recs",
+    "reviews"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "silk_header": {
+      "type": "silk-header",
+      "settings": {
+        "wordmark": "Bluvana",
+        "nav_names": "Pajama Sets|Slip Dresses|Robes|Lace|Colors|About"
+      }
+    }
+  },
+  "order": ["silk_header"]
+}

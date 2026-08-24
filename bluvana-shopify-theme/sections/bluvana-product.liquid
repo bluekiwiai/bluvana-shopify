@@ -1,0 +1,659 @@
+{{ 'bluvana-product.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bluvana-product.js' | asset_url }}" defer="defer"></script>
+
+{% liquid
+  assign color_index = 0
+  assign purchase_index = 0
+  for option in product.options_with_values
+    if option.name == 'Color'
+      assign color_index = forloop.index
+    endif
+    if option.name == 'Purchase'
+      assign purchase_index = forloop.index
+    endif
+  endfor
+  if purchase_index == 0 and product.options.size == 1
+    assign purchase_index = 1
+  endif
+
+  case product.handle
+    when 'shower-filter'
+      assign bvp_solo_label = 'Filter only'
+      assign bvp_bundle_label = 'Filter + 3 cartridges'
+    when 'multi-spray-showerhead'
+      assign bvp_solo_label = 'Showerhead only'
+      assign bvp_bundle_label = 'Showerhead + 3 cartridges'
+    when 'luxe-flow-showerhead'
+      assign bvp_solo_label = 'Showerhead only'
+      assign bvp_bundle_label = 'Showerhead + 3 cartridges'
+    when 'replacement-cartridges'
+      assign bvp_solo_label = 'Single cartridge'
+      assign bvp_bundle_label = '3-pack'
+    else
+      assign bvp_solo_label = 'One time'
+      assign bvp_bundle_label = 'Bundle'
+  endcase
+
+  assign bvp_cart3_variant = null
+  if product.handle != 'replacement-cartridges'
+    assign bvp_cart_product = all_products['replacement-cartridges']
+    if bvp_cart_product
+      for v in bvp_cart_product.variants
+        assign vt = v.title | downcase
+        if vt contains '3'
+          assign bvp_cart3_variant = v
+        endif
+      endfor
+      if bvp_cart3_variant == null
+        assign bvp_cart3_variant = bvp_cart_product.selected_or_first_available_variant
+      endif
+    endif
+  endif
+%}
+
+<div
+  class="bvp"
+  data-bvp
+  data-handle="{{ product.handle }}"
+  data-color-index="{{ color_index }}"
+  data-purchase-index="{{ purchase_index }}"
+>
+
+  {% # ================= BUY BOX ================= %}
+  <section class="bvp-hero" id="bv-buy" aria-label="{{ product.title | escape }}">
+    <div class="bvp-gallery" data-bvp-gallery>
+      <div class="bvp-stage">
+        {% for media in product.media %}
+          <img
+            class="bvp-stage-img{% if forloop.first %} is-active{% endif %}"
+            src="{{ media | image_url: width: 1200 }}"
+            width="1200"
+            height="1800"
+            {% unless forloop.first %}loading="lazy"{% endunless %}
+            alt="{{ media.alt | default: product.title | escape }}"
+            data-bvp-slide="{{ forloop.index0 }}"
+            data-media-id="{{ media.id }}"
+          >
+        {% endfor %}
+        {% if product.media.size > 1 %}
+          <button type="button" class="bvp-stage-arrow bvp-stage-arrow--prev" data-bvp-prev aria-label="Previous image">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10.5 2.5 5 8l5.5 5.5"/></svg>
+          </button>
+          <button type="button" class="bvp-stage-arrow bvp-stage-arrow--next" data-bvp-next aria-label="Next image">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5.5 2.5 11 8l-5.5 5.5"/></svg>
+          </button>
+        {% endif %}
+      </div>
+      <div class="bvp-thumbs" role="tablist" aria-label="Product images">
+        {% for media in product.media %}
+          <button
+            type="button"
+            role="tab"
+            class="bvp-thumb{% if forloop.first %} is-active{% endif %}"
+            aria-label="Image {{ forloop.index }}"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            data-bvp-thumb="{{ forloop.index0 }}"
+          >
+            <img src="{{ media | image_url: width: 160 }}" width="80" height="80" loading="lazy" alt="">
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="bvp-buy">
+      <a class="bvp-rating" href="#bvp-reviews">
+        <span class="bvp-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <b>4.9</b>
+        <span class="bvp-rating-chip">250+ reviews</span>
+      </a>
+
+      <h1 class="bvp-title">{{ product.title }}</h1>
+
+      {% if color_index > 0 %}
+        <div class="bvp-colors" data-bvp-colors>
+          <span class="bvp-colors-label">Color: <b data-bvp-color-name></b><em class="bvp-soldout-tag" data-bvp-color-soldout hidden>Sold out</em></span>
+          <div class="bvp-swatches">
+            {% assign color_option = product.options_with_values | where: 'name', 'Color' | first %}
+            {% assign ci0 = color_index | minus: 1 %}
+            {% for value in color_option.values %}
+              {% assign color_avail = false %}
+              {% for variant in product.variants %}
+                {% if variant.options[ci0] == value and variant.available %}
+                  {% assign color_avail = true %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+              {% comment %} Gold is intentionally shown as sold out on the Shower Filter Pro page. {% endcomment %}
+              {% if product.handle == 'shower-filter' and value == 'Gold' %}
+                {% assign color_avail = false %}
+              {% endif %}
+              <label class="bvp-swatch bvp-swatch--{{ value | handleize }}{% unless color_avail %} is-soldout{% endunless %}" title="{{ value }}{% unless color_avail %} — sold out{% endunless %}">
+                <input type="radio" name="bvp-color" value="{{ value | escape }}" {% if forloop.first %}checked{% endif %} data-bvp-color data-available="{{ color_avail }}">
+                <span></span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <ul class="bvp-claims" role="list">
+        {% case product.handle %}
+          {% when 'shower-filter' %}
+            <li>Stops the post-shower itch from the very first shower.</li>
+            <li>20 stages catch the chlorine, rust and sediment behind it.</li>
+            <li>Calmer skin in 30 days, or your money back.</li>
+          {% when 'multi-spray-showerhead' %}
+            <li>Stops the post-shower itch from the very first shower.</li>
+            <li>The 20-stage filter is built into the head. Six spray settings.</li>
+            <li>Calmer skin in 30 days, or your money back.</li>
+          {% when 'luxe-flow-showerhead' %}
+            <li>Stops the post-shower itch from the very first shower.</li>
+            <li>Rain-style face in polished chrome, 20-stage filter inside.</li>
+            <li>Calmer skin in 30 days, or your money back.</li>
+          {% when 'replacement-cartridges' %}
+            <li>Fits every Bluvana filter and filtered showerhead.</li>
+            <li>Swap in seconds, no tools.</li>
+            <li>One cartridge is about 3 months of filtered showers.</li>
+          {% else %}
+            <li>20-stage filtration in every shower.</li>
+        {% endcase %}
+      </ul>
+
+      {% form 'product', product, class: 'bvp-form' %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-bvp-id>
+
+        <div class="bvp-offers" role="radiogroup" aria-label="Purchase options">
+          <label class="bvp-offer bvp-offer--bundle is-active" data-bvp-offer="bundle" data-bvp-offer-hide>
+            <span class="bvp-offer-ribbon" aria-hidden="true">Most popular</span>
+            <span class="bvp-offer-head">
+              <input type="radio" name="bvp-purchase" value="bundle" checked>
+              <span class="bvp-offer-name">{{ bvp_bundle_label }}</span>
+              <span class="bvp-offer-price">
+                <s data-bvp-bundle-compare></s>
+                <b data-bvp-bundle-price></b>
+              </span>
+              <span class="bvp-offer-save" data-bvp-save-chip></span>
+            </span>
+            <ul class="bvp-offer-checks" role="list">
+              {% if product.handle == 'replacement-cartridges' %}
+                <li>A full year of filtered showers</li>
+                <li>Cheaper than buying one at a time</li>
+                <li>Swap with the seasons</li>
+                <li>30-day risk-free returns</li>
+              {% else %}
+                <li>No post-shower itch</li>
+                <li>Calmer, softer skin and hair</li>
+                <li>A full year of cartridges</li>
+                <li>30-day risk-free returns</li>
+              {% endif %}
+            </ul>
+            <span class="bvp-offer-sub">One fresh cartridge every 3 months. Under 20&cent; a day for a year of soft water.</span>
+          </label>
+
+          <label class="bvp-offer" data-bvp-offer="solo">
+            <span class="bvp-offer-head">
+              <input type="radio" name="bvp-purchase" value="solo">
+              <span class="bvp-offer-name">{{ bvp_solo_label }}</span>
+              <span class="bvp-offer-price"><b data-bvp-solo-price></b></span>
+            </span>
+          </label>
+
+          {% if bvp_cart3_variant %}
+            <label class="bvp-offer" data-bvp-offer="cartridges">
+              <span class="bvp-offer-head">
+                <input type="radio" name="bvp-purchase" value="cartridges">
+                <span class="bvp-offer-name">Cartridges only · 3-pack</span>
+                <span class="bvp-offer-price"><b>{{ bvp_cart3_variant.price | money }}</b></span>
+              </span>
+              <span class="bvp-offer-sub">Just the refills. A year of filtered showers, fits every Bluvana filter.</span>
+            </label>
+          {% endif %}
+        </div>
+
+        <div class="bvp-buyrow">
+          <div class="bvp-qty" data-bvp-qty>
+            <button type="button" data-bvp-qty-minus aria-label="Decrease quantity">&minus;</button>
+            <input type="text" name="quantity" value="1" inputmode="numeric" aria-label="Quantity" data-bvp-qty-input>
+            <button type="button" data-bvp-qty-plus aria-label="Increase quantity">+</button>
+          </div>
+          <button type="submit" class="bvp-atc" data-bvp-atc><span data-bvp-atc-label>Add to cart &middot;&nbsp;</span><span data-bvp-total>{{ product.selected_or_first_available_variant.price | money }}</span></button>
+        </div>
+        {% comment %}
+          Dynamic wallet button intentionally omitted until Shopify Payments is
+          activated with Apple Pay enabled and Shop Pay disabled. Restore with:
+          {{ form | payment_button }}
+        {% endcomment %}
+
+        <ul class="bvp-assure" role="list">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 6.5h11.5v9H2.5z"/><path d="M14 9.8h4l3.5 3.4v2.3H14"/><circle cx="7" cy="17.6" r="1.7"/><circle cx="17.3" cy="17.6" r="1.7"/></svg>Free US shipping</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 19 5.6v5.1c0 4.4-2.9 7.8-7 9.5-4.1-1.7-7-5.1-7-9.5V5.6z"/><path d="M8.8 11.6l2.3 2.3 4.3-4.3"/></svg>30-day returns</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V10a8 8 0 0 1 16 0v1"/><path d="M15.8 14h8.2"/><path d="M20 11v3"/><path d="M17.8 17v1.8M22.2 17v1.8"/></svg>Fits standard arms</li>
+        </ul>
+      {% endform %}
+
+      <div class="bvp-tabs" data-bvp-tabs>
+        <div class="bvp-tab-nav" role="tablist">
+          <button type="button" class="is-active" role="tab" data-bvp-tab="benefits">Benefits</button>
+          <button type="button" role="tab" data-bvp-tab="how">How to use</button>
+          <button type="button" role="tab" data-bvp-tab="box">Box contents</button>
+          <button type="button" role="tab" data-bvp-tab="shipping">Shipping &amp; returns</button>
+        </div>
+        <div class="bvp-tab-panel is-active" data-bvp-panel="benefits">
+          <ul class="bvp-check-grid" role="list">
+            <li>No post-shower itch</li>
+            <li>Calmer, softer skin</li>
+            <li>Shinier, easier hair</li>
+            <li>No chlorine smell</li>
+            <li>Keeps your pressure</li>
+            <li>5-minute install</li>
+          </ul>
+        </div>
+        <div class="bvp-tab-panel" data-bvp-panel="how">
+          <ol class="bvp-mini-steps" role="list">
+            <li>Unscrew your showerhead by hand.</li>
+            <li>Thread the filter onto the arm. Hand tight.</li>
+            <li>Reattach, run hot water for one minute. Done.</li>
+          </ol>
+        </div>
+        <div class="bvp-tab-panel" data-bvp-panel="shipping">
+          <ul class="bvp-check-grid" role="list">
+            <li>Free tracked US shipping on every order</li>
+            <li>Ships in 1&ndash;2 business days, arrives in 2&ndash;5</li>
+            <li>30-day risk-free returns &mdash; full refund, no restocking fee</li>
+            <li>Start a return from your order email in seconds</li>
+          </ul>
+        </div>
+        <div class="bvp-tab-panel" data-bvp-panel="box">
+          <ul class="bvp-check-grid" role="list">
+            {% case product.handle %}
+              {% when 'replacement-cartridges' %}
+                <li>20-stage cartridge, sealed</li>
+                <li>Fits all Bluvana housings</li>
+              {% else %}
+                <li>Polished chrome housing</li>
+                <li>20-stage cartridge, installed</li>
+                <li>Thread seal tape</li>
+                <li>Install guide</li>
+            {% endcase %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% # ================= SPEC STRIP ================= %}
+  <ul class="bvp-strip" role="list">
+    <li><svg class="bvp-strip-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8s5.8 6.4 5.8 10.7a5.8 5.8 0 1 1-11.6 0C6.2 9.2 12 2.8 12 2.8z"/></svg><span>20-stage cartridge</span></li>
+    <li><svg class="bvp-strip-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l1.9 5.6 5.6 1.9-5.6 1.9L12 18.5l-1.9-5.6-5.6-1.9 5.6-1.9z"/></svg><span>Chlorine <i class="bvp-strip-dot" aria-hidden="true">&middot;</i> rust <i class="bvp-strip-dot" aria-hidden="true">&middot;</i> sediment</span></li>
+    <li><svg class="bvp-strip-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.6 6.3a4.2 4.2 0 0 0-5.7 5.2L3 17.4V21h3.6l5.9-5.9a4.2 4.2 0 0 0 5.2-5.7l-3 3-2.6-.7-.7-2.6z"/></svg><span>5-minute install</span></li>
+    <li><svg class="bvp-strip-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 3.5v5h5"/></svg><span>30-day returns</span></li>
+    <li class="bvp-strip-clone" aria-hidden="true"><svg class="bvp-strip-ico" viewBox="0 0 24 24"><path d="M12 2.8s5.8 6.4 5.8 10.7a5.8 5.8 0 1 1-11.6 0C6.2 9.2 12 2.8 12 2.8z"/></svg><span>20-stage cartridge</span></li>
+    <li class="bvp-strip-clone" aria-hidden="true"><svg class="bvp-strip-ico" viewBox="0 0 24 24"><path d="M12 3.5l1.9 5.6 5.6 1.9-5.6 1.9L12 18.5l-1.9-5.6-5.6-1.9 5.6-1.9z"/></svg><span>Chlorine <i class="bvp-strip-dot">&middot;</i> rust <i class="bvp-strip-dot">&middot;</i> sediment</span></li>
+    <li class="bvp-strip-clone" aria-hidden="true"><svg class="bvp-strip-ico" viewBox="0 0 24 24"><path d="M14.6 6.3a4.2 4.2 0 0 0-5.7 5.2L3 17.4V21h3.6l5.9-5.9a4.2 4.2 0 0 0 5.2-5.7l-3 3-2.6-.7-.7-2.6z"/></svg><span>5-minute install</span></li>
+    <li class="bvp-strip-clone" aria-hidden="true"><svg class="bvp-strip-ico" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 3.5v5h5"/></svg><span>30-day returns</span></li>
+  </ul>
+
+  {% # ================= THE SOLUTION ================= %}
+  <section class="bvp-solution" aria-labelledby="bvp-solution-title">
+    <div class="bvp-solution-copy">
+      <h2 id="bvp-solution-title" class="bvp-serif">It&rsquo;s not sensitive skin. It&rsquo;s harsh water.</h2>
+      <p class="bvp-oneliner">Tight, itchy skin after every shower? That&rsquo;s the water, not you.</p>
+      <p class="bvp-removes-label">What it catches before it touches you</p>
+      <ul class="bvp-x-grid" role="list">
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-1">Chlorine</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-1">Strips your skin&rsquo;s natural oils. Hello, dry and itchy.</span>
+        </li>
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-2">Rust flakes</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-2">From old city pipes. Irritates sensitive skin.</span>
+        </li>
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-3">Sediment</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-3">Fine grit that ends up clogging your pores.</span>
+        </li>
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-4">Limescale</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-4">The white crust. Coats hair and blocks moisture.</span>
+        </li>
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-5">Heavy metals</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-5">Invisible, and absorbed by your skin daily.</span>
+        </li>
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-6">Odors</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-6">That musty, metallic smell in hot steam.</span>
+        </li>
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-7">Cloudy minerals</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-7">Hard water. The reason hair feels like straw.</span>
+        </li>
+        <li class="bvp-x-item">
+          <span class="bvp-x-ico" aria-hidden="true"></span>
+          <button type="button" class="bvp-x-name" aria-expanded="false" aria-describedby="bvp-tip-8">The pool smell</button>
+          <span class="bvp-x-tip" role="tooltip" id="bvp-tip-8">Chlorine fumes you breathe in every shower.</span>
+        </li>
+      </ul>
+      <a class="bvp-btn-outline" href="#bv-buy">Choose yours<span class="bvp-arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+    <div class="bvp-solution-media">
+      <img src="{{ 'bvp-solution-hair.jpg' | asset_url }}" width="1024" height="1536" loading="lazy" alt="Detangling wet hair with a wide-tooth comb">
+    </div>
+  </section>
+
+  {% # ================= BEFORE / AFTER ================= %}
+  <section class="bvp-proof" aria-labelledby="bvp-proof-title">
+    {% # Wavy top edge: the mist band rides up over the section above it, with a %}
+    {% # soft shadow drawn inside the SVG (clipped so it only falls on the white). %}
+    <div class="bvp-wave-top" aria-hidden="true">
+      <svg viewBox="0 0 1440 64" preserveAspectRatio="none" focusable="false">
+        <defs>
+          <filter id="bvWaveTopBlur" x="-5%" y="-60%" width="110%" height="220%">
+            <feGaussianBlur stdDeviation="4"/>
+          </filter>
+          <clipPath id="bvWaveTopClip">
+            <path d="M0 0 L1440 0 L1440 34 C 1360 44 1260 30 1100 22 C 900 12 740 30 540 40 C 340 50 180 24 0 38 Z"/>
+          </clipPath>
+        </defs>
+        <path fill="#EAF7FB" d="M0 64 L0 38 C 180 24 340 50 540 40 C 740 30 900 12 1100 22 C 1260 30 1360 44 1440 34 L1440 64 Z"/>
+        <path d="M0 38 C 180 24 340 50 540 40 C 740 30 900 12 1100 22 C 1260 30 1360 44 1440 34" fill="none" stroke="rgba(10,37,64,0.20)" stroke-width="12" filter="url(#bvWaveTopBlur)" clip-path="url(#bvWaveTopClip)"/>
+      </svg>
+    </div>
+    <h2 id="bvp-proof-title" class="bvp-serif bvp-center">Calm skin, from the very first shower.</h2>
+    <div class="bvp-proof-scroll" role="list">
+      <figure class="bvp-proof-tile" role="listitem">
+        <div class="bvp-proof-media"><img src="{{ 'bvp-proof-skin-front.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after: red, breaking-out skin on the left, calm clear skin on the right"></div>
+        <figcaption>&ldquo;Dandruff, dry skin, acne, hair loss. This has made my hair and skin soft and stopped the peeling. Acne is drastically reduced.&rdquo;<span class="bvp-proof-meta"><span class="bvp-proof-who">Vanessa R.</span><span class="bvp-review-flag bvp-review-flag--proof">&#10003; Verified buyer</span></span></figcaption>
+      </figure>
+      <figure class="bvp-proof-tile" role="listitem">
+        <div class="bvp-proof-media"><img src="{{ 'bvp-proof-skin-cheek.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after close-up: irritated cheek on the left, smooth even skin on the right"></div>
+        <figcaption>&ldquo;The skin feels so soft, and the itching I had for so long is gone.&rdquo;<span class="bvp-proof-meta"><span class="bvp-proof-who">Olga Vazquez</span><span class="bvp-review-flag bvp-review-flag--proof">&#10003; Verified buyer</span></span></figcaption>
+      </figure>
+      <figure class="bvp-proof-tile" role="listitem">
+        <div class="bvp-proof-media"><img src="{{ 'bvp-proof-hair-shine.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after: dull frizzy hair on the left, soft glossy waves on the right"></div>
+        <figcaption>&ldquo;My hair feels softer, not like a Brillo pad anymore.&rdquo;<span class="bvp-proof-meta"><span class="bvp-proof-who">Rachel Donovan</span><span class="bvp-review-flag bvp-review-flag--proof">&#10003; Verified buyer</span></span></figcaption>
+      </figure>
+      <figure class="bvp-proof-tile" role="listitem">
+        <div class="bvp-proof-media"><img src="{{ 'bvp-proof-skin-profile.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after profile: textured, inflamed cheek on the left, smooth calm skin on the right"></div>
+        <figcaption>&ldquo;Skin feels much smoother instantly. No chlorine fumes as I shower.&rdquo;<span class="bvp-proof-meta"><span class="bvp-proof-who">Eddy Oviedo</span><span class="bvp-review-flag bvp-review-flag--proof">&#10003; Verified buyer</span></span></figcaption>
+      </figure>
+      <figure class="bvp-proof-tile" role="listitem">
+        <div class="bvp-proof-media"><img src="{{ 'bvp-proof-skin-glow.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after: blotchy irritated skin on the left, clear glowing skin on the right"></div>
+        <figcaption>&ldquo;Noticeable difference. Skin is softer, skin feels cleaner, hair is less frizzy.&rdquo;<span class="bvp-proof-meta"><span class="bvp-proof-who">K. Olivarez</span><span class="bvp-review-flag bvp-review-flag--proof">&#10003; Verified buyer</span></span></figcaption>
+      </figure>
+      <figure class="bvp-proof-tile" role="listitem">
+        <div class="bvp-proof-media"><img src="{{ 'bvp-proof-skin-clear.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after: spotted forehead and cheeks on the left, even clear complexion on the right"></div>
+        <figcaption>&ldquo;Our brown water is now clear, and my skin has cleared up.&rdquo;<span class="bvp-proof-meta"><span class="bvp-proof-who">Marsha Sands</span><span class="bvp-review-flag bvp-review-flag--proof">&#10003; Verified buyer</span></span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {% # ================= THE NUMBERS ================= %}
+  <section class="bvp-numbers" aria-labelledby="bvp-numbers-title">
+    <div class="bvp-numbers-head">
+      <h2 id="bvp-numbers-title" class="bvp-serif">Most shower filters have two stages. This one has twenty.</h2>
+      <p class="bvp-numbers-blurb">A $20 filter is one screen and a spoonful of carbon. Twenty stages means genuinely different water on your skin.</p>
+    </div>
+    <div class="bvp-numbers-hero">
+      <div class="bvp-numbers-big">
+        <span class="bvp-big-num">20</span>
+        <span class="bvp-big-label">stages of filtration media in every cartridge</span>
+      </div>
+      <div class="bvp-bars">
+        <div class="bvp-bar-row">
+          <span class="bvp-bar-name">Typical filter</span>
+          <span class="bvp-bar"><span class="bvp-bar-fill bvp-bar-fill--other" style="width: 8%"></span></span>
+          <span class="bvp-bar-val">1 to 2 stages</span>
+        </div>
+        <div class="bvp-bar-row">
+          <span class="bvp-bar-name">Shower Filter Pro</span>
+          <span class="bvp-bar"><span class="bvp-bar-fill bvp-bar-fill--ours" style="width: 100%"></span></span>
+          <span class="bvp-bar-val">20 stages</span>
+        </div>
+      </div>
+    </div>
+    <div class="bvp-numbers-grid">
+      <div class="bvp-num-card">
+        <p class="bvp-num-lead">Installs by hand in</p>
+        <span class="bvp-big-num bvp-big-num--mid">5<span class="bvp-big-unit"> min</span></span>
+        <p class="bvp-num-sub">No tools, no plumber. Thread tape is in the box.</p>
+      </div>
+      <div class="bvp-num-card">
+        <p class="bvp-num-lead">One cartridge lasts about</p>
+        <span class="bvp-big-num bvp-big-num--mid">3<span class="bvp-big-unit"> mo</span></span>
+        <p class="bvp-num-sub">Ninety days of filtered showers, then it swaps out in seconds.</p>
+      </div>
+    </div>
+    <div class="bvp-numbers-cta">
+      <a class="bvp-btn-outline bvp-btn-outline--light" href="#bv-buy">Feel the difference<span class="bvp-arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+  </section>
+
+  {% # ================= COMMUNITY / CREATORS ================= %}
+  <section class="bvp-creators" aria-label="Customer videos">
+    <div class="bvp-vids-scroll" role="list">
+      {% for i in (1..3) %}
+        <figure class="bvp-vid" role="listitem">
+          <video src="{{ 'bvp-ugc-video-' | append: i | append: '.mp4' | asset_url }}" muted autoplay loop playsinline preload="metadata" disablepictureinpicture title="Customer video review {{ i }} of 3"></video>
+        </figure>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% # ================= COMPARISON ================= %}
+  <section class="bvp-compare" aria-labelledby="bvp-compare-title">
+    <h2 id="bvp-compare-title" class="bvp-serif bvp-center">How Bluvana stacks up.</h2>
+    <div class="bvp-compare-table">
+      <div class="bvp-compare-row bvp-compare-row--head">
+        <span class="bvp-compare-feat"></span>
+        <span class="bvp-compare-col bvp-compare-col--ours">
+          <img class="bvp-compare-pro-img" src="{{ 'bvp-compare-pro.jpg' | asset_url }}" width="120" height="138" loading="lazy" alt="Shower Filter Pro, chrome housing with a cutaway showing the twenty filtration stages">
+          <b>Shower Filter Pro</b>
+        </span>
+        <span class="bvp-compare-col bvp-compare-col--other">
+          <span class="bvp-generic" role="img" aria-label="Illustration of a basic plastic filter: water and sediment pass straight through its two thin stages">
+            <span class="bvp-generic-cap" aria-hidden="true"></span>
+            <span class="bvp-generic-body" aria-hidden="true">
+              <span class="bvp-generic-stage"></span>
+              <span class="bvp-generic-stage bvp-generic-stage--2"></span>
+              <i style="--x:14%; --d:0s"></i>
+              <i style="--x:32%; --d:.9s"></i>
+              <i style="--x:50%; --d:1.7s"></i>
+              <i style="--x:66%; --d:.45s"></i>
+              <i style="--x:82%; --d:1.3s"></i>
+              <i style="--x:24%; --d:2.1s"></i>
+              <i style="--x:58%; --d:2.5s"></i>
+            </span>
+            <span class="bvp-generic-thread" aria-hidden="true"></span>
+          </span>
+          <b>Traditional shower filters</b>
+        </span>
+      </div>
+      <div class="bvp-compare-row">
+        <span class="bvp-compare-feat">Filtration media</span>
+        <span class="bvp-compare-col bvp-compare-col--ours"><b>20 stages</b></span>
+        <span class="bvp-compare-col bvp-compare-col--other">1 to 2 stages</span>
+      </div>
+      <div class="bvp-compare-row">
+        <span class="bvp-compare-feat">Catches chlorine and the pool smell</span>
+        <span class="bvp-compare-col bvp-compare-col--ours"><i class="bvp-checky" aria-hidden="true"></i><span class="visually-hidden">Yes</span></span>
+        <span class="bvp-compare-col bvp-compare-col--other"><i class="bvp-nope" aria-hidden="true"></i><span class="visually-hidden">No</span></span>
+      </div>
+      <div class="bvp-compare-row">
+        <span class="bvp-compare-feat">Catches rust, sediment and limescale</span>
+        <span class="bvp-compare-col bvp-compare-col--ours"><i class="bvp-checky" aria-hidden="true"></i><span class="visually-hidden">Yes</span></span>
+        <span class="bvp-compare-col bvp-compare-col--other"><i class="bvp-nope" aria-hidden="true"></i><span class="visually-hidden">No</span></span>
+      </div>
+      <div class="bvp-compare-row">
+        <span class="bvp-compare-feat">Cartridge life</span>
+        <span class="bvp-compare-col bvp-compare-col--ours"><b>About 3 months</b></span>
+        <span class="bvp-compare-col bvp-compare-col--other">Often 30 days</span>
+      </div>
+      <div class="bvp-compare-row">
+        <span class="bvp-compare-feat">Install</span>
+        <span class="bvp-compare-col bvp-compare-col--ours"><b>5 minutes, by hand</b></span>
+        <span class="bvp-compare-col bvp-compare-col--other">Tools or a plumber</span>
+      </div>
+      <div class="bvp-compare-row">
+        <span class="bvp-compare-feat">Build</span>
+        <span class="bvp-compare-col bvp-compare-col--ours"><b>Weighted chrome housing</b></span>
+        <span class="bvp-compare-col bvp-compare-col--other">Light plastic</span>
+      </div>
+    </div>
+    <div class="bvp-compare-cta">
+      <a class="bvp-btn-outline" href="#bv-buy">Choose yours<span class="bvp-arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+  </section>
+
+  {% # ================= REVIEWS ================= %}
+  <section class="bvp-reviews" id="bvp-reviews" aria-labelledby="bvp-reviews-title">
+    <div class="bvp-reviews-head">
+      <div class="bvp-reviews-laurel">
+        <svg class="bvp-reviews-laurel-branch" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><path d="M20 2c-5 3-8 8-8 15 0 5 2 9 5 12"/><path d="M14.5 5.5c-2.3.4-4-.8-4.5-3 2.3-.5 4 .7 4.5 3ZM11.5 11c-2.3.8-4.2 0-5.2-2 2.1-1 4.1-.3 5.2 2ZM10.6 17c-2.2 1.1-4.3.7-5.6-1.2 1.9-1.3 4-1 5.6 1.2ZM11.6 22.7c-1.8 1.6-4 1.7-5.8.2 1.6-1.7 3.7-1.9 5.8-.2Z"/></svg>
+        <span class="bvp-stars bvp-stars--big" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <svg class="bvp-reviews-laurel-branch bvp-reviews-laurel-branch--r" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><path d="M20 2c-5 3-8 8-8 15 0 5 2 9 5 12"/><path d="M14.5 5.5c-2.3.4-4-.8-4.5-3 2.3-.5 4 .7 4.5 3ZM11.5 11c-2.3.8-4.2 0-5.2-2 2.1-1 4.1-.3 5.2 2ZM10.6 17c-2.2 1.1-4.3.7-5.6-1.2 1.9-1.3 4-1 5.6 1.2ZM11.6 22.7c-1.8 1.6-4 1.7-5.8.2 1.6-1.7 3.7-1.9 5.8-.2Z"/></svg>
+      </div>
+      <h2 id="bvp-reviews-title" class="bvp-serif">4.9 from 1,000+ verified buyers.</h2>
+      <p class="bvp-reviews-sub">Collected from verified purchases of this exact filter and showerhead. Bluvana reviews join them as they arrive.</p>
+      <button type="button" class="bvp-btn-gold" data-bvp-review-open>Write a review</button>
+    </div>
+    <div class="bvp-review-grid" data-bvp-review-grid aria-live="polite"></div>
+    <div class="bvp-review-pager">
+      <button type="button" class="bvp-pager-btn" data-bvp-review-prev>&lsaquo; Back</button>
+      <span class="bvp-pager-status" data-bvp-review-page></span>
+      <button type="button" class="bvp-pager-btn" data-bvp-review-next>Next &rsaquo;</button>
+    </div>
+    <script type="application/json" data-bvp-reviews>[{"n": "Miriam Morris", "d": "Dec 23, 2025", "t": "Felt a huge difference after very first shower. Our water sucks though.. Still recommend🙂", "img": []}, {"n": "Rachel Donovan", "d": "Mar 18, 2026", "t": "I used it today. Easy to install, you need to use a decent telfon tape. Mine drips a little, but I am ok with that. I have to say my skin does not itch after taking a shower. My hair feels softer and not like a brillo pad. I'm in the Midwest where the heaviest toxin is Lead. The town I'm in sends out notices about twice a yr about running your cold water for 15-30 seconds before using...and hot water don't think about using it for baby formula.... Where is Erin Brockovich when you need her...lol fast delivery. Thank you", "img": []}, {"n": "Sharon Veihl", "d": "Apr 11, 2026", "t": "I can't wait to get it installed. We have hard water in my apartment complex and my doctor recommended this to reduce eczema on my scalp. It's a good quality filter I would recommend.", "img": []}, {"n": "Aiperi Azamatova", "d": "Jan 22, 2026", "t": "I recommend this to everyone. After moving, I had severe dandruff, and no shampoos helped at all. So I ordered this product, and it saved my hair! Thank you for the fast delivery. It was the first item to arrive out of everything I ordered", "img": []}, {"n": "Elena Kolesnyk", "d": "Dec 25, 2025", "t": "Great, my skin is not as red and itchy anymore", "img": []}, {"n": "", "d": "Nov 19, 2025", "t": "Since I bought this, my skin is not itchy scratchy. It looks healthier buy it. It’s worth it. I love it. Thank you you", "img": []}, {"n": "Yuliani Añanguren", "d": "Dec 1, 2024", "t": "After I put this filter on, I saw quick results in my hair and less dry skin. Highly recommended and easy to install.", "img": []}, {"n": "", "d": "Feb 27, 2026", "t": "The positive reviews had me curious and this was an impulse buy. I never knew why people call it hard water versus soft water before this but after installation it actually felt like the water feels softer. Unsure if it is placebo effect, but I swear the water feels cleaner and less harsh. It was very easy to install. I noticed another reviewer mentioned dirty water during flushing but I didn't notice any while flushing this in the sink. On the other hand I noticed a lot of buildup and black water needed to be flushed from the shower pipe first", "img": ["https://rewimg.us.kwcdn.com/review-image/212a0cb8ac/2557e383-3bbf-43bb-b448-6cba301277c1_4032x3024.jpeg.compressed.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/212a0cb8ac/49aeda75-fb0b-4009-8fd6-ed539987e4d2_4032x3024.jpeg.compressed.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "Danielle Brooks", "d": "Jun 2, 2025", "t": "seems to be working well. quality is better than expected. easy install. now I need to order extra filters.", "img": []}, {"n": "Melissa Osborne", "d": "Apr 20, 2025", "t": "I love it. it really does help. I measured the ph and it's really so much of a difference. I've been using it for 2 weeks now. I'd buy one just to put it in storage", "img": []}, {"n": "Marcela Nomelin", "d": "Jan 2, 2025", "t": "Here I show you how the order arrives and everything it includes. I can't comment further because I haven't tried it yet, but I imagine it should be very effective at filtering water. My rating of the product is based on the packaging and material.", "img": ["https://rewimg.us.kwcdn.com/review-image/20a3d41b4e/cbd4bd9c-8203-46f8-91e5-08615d8bf49f_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "K. Olivarez", "d": "Oct 26, 2024", "t": "Been using for 3 days now & noticeable difference in skin being softer, skin feels cleaner, nails are glossy, hair is less frizzy. It is pretty effective considering how much I have spent on products to deliver the same results that this shower filter provides. Impressive.", "img": []}, {"n": "Chris Moore", "d": "Jan 16, 2026", "t": "works well does what it says it filters out the water. my water fills 10 times softer and I feel like I'm getting cleaner. five star review", "img": ["https://rewimg.us.kwcdn.com/review-image/21a488dd34/848c41da-6f62-44c0-82f0-fda28e47efd6.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "Vanessa Ruiz", "d": "Jun 5, 2025", "t": "my old filter gave out , water quality out here is badddd. dandruff dry skin, acne. hair loss. this has made my hair and skin soft and stop peeling off. acne is drastically reduced. I literally don't want to know what is in my frickin water but if you're somewhere w chlorine and bacteria ick in your water. 10/10 recommend just for the filter. my whole family is enjoying our shower including our cats. mkay. good water filtration.", "img": []}, {"n": "", "d": "Feb 15, 2025", "t": "Oh yeahhhh!! I'm looking forward to nicer hair and skin!! thank you!! Mr. Seller for your items", "img": ["https://rewimg.us.kwcdn.com/review-image/2029de0000/720f4c41-fcd2-4cbc-8c7c-2d5d1fa3c816.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/2029de0000/e19170b8-bae9-47f4-9510-80f69ee96310.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/2029de0000/3e96cb77-12c2-4f26-a5c2-5271b6e620b3.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Apr 21, 2025", "t": "Just received this filter, so far the item is as-described and the construction of it is solid. I flushed the filter beforehand and followed the installation instructions (which are fairly simple). Will potentially update my review if anything changes!", "img": ["https://rewimg.us.kwcdn.com/review-image/2013f774c3c/a094cdd6-9013-4cc0-b316-d5ddf5aafcc7_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Sep 3, 2025", "t": "For me, it's an extremely necessary product for both skin and hair care. I give it a 10 out of 10; the change is noticeable after using it. I change it about every 6 months, and I highly recommend it to everyone.", "img": ["https://rewimg.us.kwcdn.com/review-image/20150c205be/cdcb4296-c4a9-4829-be9c-9f096f56e3d5_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Dec 2, 2025", "t": "I live in Southeast Arkansas where our tap water smells like straight-up pool water. The smell of chlorine is so pungent, I refused to wash my hair in the shower and would only use the faucet water in the kitchen that is filtered. Then I purchased this. Off the bat, it's A LOT larger than I expected, but again, I have no idea about plumbing so what the heck do I know?! But you know what? Size must matter because this thing WORKS! The water from the shower we installed it on no longer smells like chlorine and I'm excited to see how our skin and hair respond.", "img": []}, {"n": "Jessica & John Hartman", "d": "Feb 2, 2025", "t": "Nice shower filter. works well, and is an amazing product. Highly recommend.", "img": []}, {"n": "Amanda Ragusa", "d": "Jan 7, 2026", "t": "Really amazing noticed a difference 1st time I used it", "img": ["https://rewimg.us.kwcdn.com/review-image/21a4882922/3f64429c-d054-4cd1-89b2-52e81e7383e8_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Sep 30, 2024", "t": "great for the price..I haven't used it yet..but all the other filters are great! This particular one is larger so it will last longer. It's really good for your whole body.", "img": []}, {"n": "", "d": "Mar 9, 2025", "t": "Better than getting the same thing for twice or even 3x the price on Amazon. Works the exact same water feels nice and soft like a new filter should make it feel.", "img": []}, {"n": "", "d": "Mar 26, 2025", "t": "great for the price, satisfied.thanks. I appreciate this thing. In an apartment and cannot change all the water, but I can do this. I feel the difference in skin and hair.", "img": []}, {"n": "", "d": "Jan 29, 2025", "t": "i have bought 3, and used 2 so far we have very hard water and it works well", "img": []}, {"n": "Kevin True", "d": "Sep 5, 2025", "t": "It has been installed long enough for one shower. We have very hard water and so it’s an easy enough decision to give it a try! I’ll be interested in the replacement filters or another version if they make them.", "img": ["https://rewimg.us.kwcdn.com/review-image/20150c20d04/1a364dc4-c4f3-4e00-a660-44606cca04e1_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Dec 7, 2024", "t": "The shower filter arrived in excellent condition. It looks just like the picture.", "img": ["https://rewimg.us.kwcdn.com/review-image/1f193482760/cf666e1d-a5af-4a3e-a973-65deb5ff1ae1_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Jan 15, 2025", "t": "my parents live off grid, their water had my moms arms so dry, this was the perfect fix to soften their water, very satisfied , 5stars", "img": []}, {"n": "Ramon Alejo", "d": "Apr 26, 2026", "t": "Excellent purchase! This filter model is super useful and beneficial. I 100% recommend it", "img": ["https://rewimg.us.kwcdn.com/review-image/21140d68298/12e69f8a-cf69-4a3b-8be1-e19fe2a3ff19.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/21140d68298/f7b60e77-439f-48d7-bdc2-6ba71443569b.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/21140d68298/abebdf86-6832-4a8d-8183-5ba2688de791.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Dec 18, 2025", "t": "It arrived quickly and feels to be of good quality 👍 I haven't used it yet, I'll give another review after using it.", "img": ["https://rewimg.us.kwcdn.com/review-image/2019505c8f8/a6197732-b50f-4c6c-84d7-ce22d8f8c0ae_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/2019505c8f8/962b8739-5f64-4ada-9905-674ca07a4972_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Apr 7, 2025", "t": "Everything is excellent, the house is perfect.", "img": ["https://rewimg.us.kwcdn.com/review-image/2013f773904/962abbf3-9b6e-4748-8a39-3bca98ad4e47.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Apr 3, 2025", "t": "So far I can see the difference on my skin I’m no longer dealing with peeling skin after a shower and my hair also appreciates the change so going forward I will let as many people as I can to order this filter", "img": []}, {"n": "Frederick D. III", "d": "May 10, 2025", "t": "I have bought a number of these filters in the past and am always happy with their use and results. you must follow the preparation instructions accurately in order to get the best results. also when installing make sure to use enough silicone tap to make a secure seal so you don't have leaks. I use it in my triple filtration setup in my bathroom.", "img": []}, {"n": "", "d": "Mar 29, 2025", "t": "I like this filtered showerhead as it seems to work well. Be sure to rinse it well before you use it or the first shot of water out of there is going to be quite dark because of the charcoal filter in it.", "img": []}, {"n": "Eric Young", "d": "Apr 14, 2025", "t": "Great product so far. My daughter said she already felt a difference after one shower.", "img": []}, {"n": "Eddy Oviedo", "d": "Jun 16, 2025", "t": "skin feels much smoother instantly. no chlorine fumes as I shower", "img": []}, {"n": "", "d": "Jun 4, 2025", "t": "I live in an old house with pore water pressure until I removed the small valve limiting the pressure. The new filter is wonderful all of a sudden I have a pressure washer shower. All I can say is Duh.", "img": []}, {"n": "Candice Young Sharp", "d": "May 4, 2026", "t": "It's a great price! The product is well made and works as it should! It was packaged well & even came with its own washers & Teflon tape! Definitely worth every penny!", "img": ["https://rewimg.us.kwcdn.com/review-image/21137b26a14/756aa8e4-b194-4457-9179-94213a7dc955.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/21137b26a14/1305538d-04c5-4eeb-93c8-2a5265fe7658.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "Darlynn Thompson", "d": "Apr 13, 2026", "t": "the water is soft leaving hair and skin clean and soft", "img": ["https://rewimg.us.kwcdn.com/review-image/21140d6a560/1cce7463-3941-42d7-86bc-8533720f845f.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Apr 27, 2026", "t": "i can feel some difference. easy installation", "img": ["https://rewimg.us.kwcdn.com/review-image/21140d6a6b0/c09803b7-df72-4eec-83fa-a5edf5a92919.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "May 8, 2026", "t": "We've already installed it in the shower and we can definitely feel a difference ⭐️⭐️⭐️⭐️⭐️ Highly recommend!", "img": ["https://rewimg.us.kwcdn.com/review-image/21137b232c2/b275c622-16d1-4ed7-b3ac-2c905c766ca2_900x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Jun 24, 2026", "t": "This filter fits well, no leak like the previous ones i had bought. My shower head used to get stained with a brick color substance, not any more after over a month ising this filter. Highly recommended!", "img": ["https://rewimg.us.kwcdn.com/review-image/2123a62c90/7142091c-5493-4729-8d68-663fdd8eba9b_4032x3024.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "Yuliia Popova", "d": "May 20, 2026", "t": "Omg, that’s just what I needed. My hair looks much better after first use. I hope I’ll see difference for my skin quality as well", "img": ["https://rewimg.us.kwcdn.com/review-image/21137b23908/8966d859-c53d-44dd-91de-83f52bdcc2cb_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Aug 9, 2025", "t": "It works and the water feels softer, I recommend it", "img": []}, {"n": "", "d": "May 26, 2026", "t": "Doesn't filter hardness but the water does smell cleaner so even if it acts as a dechlorinator or sediment filter its better than showering with tap. Im happy for the money. Sometimes our water smells and with this filter it doesnt anymore so I think it is working to an extent.", "img": []}, {"n": "Matt Matthews", "d": "Jul 27, 2025", "t": "my water has never felt better. showering is so much faster now. run water through it for a few minutes first to get residual charcoal out of it but after the first use , all the water runs clear", "img": []}, {"n": "Marco Moreno", "d": "Dec 16, 2025", "t": "Very good product, I really liked it. I have it, now I'll see how it goes with me...", "img": []}, {"n": "Olga Vazquez", "d": "Apr 10, 2026", "t": "Very good, I needed this and it was very easy to install. It's great! The skin feels so soft, and the itching I had for so long is gone. I recommend it.", "img": []}, {"n": "", "d": "Nov 24, 2024", "t": "love this very handy and easy to install", "img": []}, {"n": "Fauve Christensen", "d": "Jan 23, 2026", "t": "these are awesome. we get really hard water where we are and these have been very helpful", "img": []}, {"n": "", "d": "May 24, 2025", "t": "The difference in the water quality is noticeable, and it's good.", "img": []}, {"n": "Anyeglaimar Timaure", "d": "Apr 12, 2025", "t": "Very fast delivery and in perfect condition. I really liked it.", "img": []}, {"n": "Dryelle Bsales", "d": "Apr 5, 2025", "t": "I really liked this filter; it delivers on its promises, and I'm going to buy more for the other bathrooms in the house!", "img": []}, {"n": "", "d": "Jun 25, 2025", "t": "Ordered two of these ones for each shower have been using them for about two weeks and they make a big difference in the bathtubs appearance and my hair is softer and shiny", "img": []}, {"n": "Elena Kolesnyk", "d": "Dec 25, 2025", "t": "Great, and it can be installed quickly in just 2 minutes. You just need to screw on the white tape first", "img": []}, {"n": "", "d": "Sep 2, 2025", "t": "Perfect, my skin and hair have improved a lot after using the filter. This is my second time buying it.", "img": []}, {"n": "", "d": "Jul 19, 2026", "t": "got a good deal and it works perfect! easy to install and shipped fast from seller.", "img": ["https://rewimg.us.kwcdn.com/review-image/217a7c4ce6/0ab62463-021a-4c7d-b050-d9ac7e832568.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/217a7c4ce6/0d361fbd-1ab0-48be-85dd-c060e85df994.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "Aug 11, 2026", "t": "Easy install. It doesn't leak. Use the tape that comes with it, and the washer.", "img": ["https://rewimg.us.kwcdn.com/review-image/21f06629e0/1af00c1f-dd4f-47e0-bc04-6bd67b8e13ab.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "Jeimy Hernandez fajardo", "d": "Apr 2, 2026", "t": "It arrived quickly. Now I'm going to set it up and see if it works", "img": ["https://rewimg.us.kwcdn.com/review-image/21140d65358/9d880a7f-049f-4979-80f3-db42e5b09a12_675x1200.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "May 25, 2026", "t": "The product arrived in good condition. Thank you so much for the fast delivery!", "img": ["https://rewimg.us.kwcdn.com/review-image/21137b22512/dd1b9906-8e87-4541-8e94-16f1a516e766.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "Latanya Williams", "d": "Mar 27, 2026", "t": "it feels genuine and expensive. haven't install as yet because I can't unscrew my shower head. but will update when I do", "img": ["https://rewimg.us.kwcdn.com/review-image/211a2a4a582/bcb27353-2aab-48af-b186-f9b827c3525c.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/211a2a4a582/efa354b7-9a57-4ce5-924d-5e7de76f7bd3.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif", "https://rewimg.us.kwcdn.com/review-image/211a2a4a582/94bd1614-0576-49bc-b476-546bbbc7af5c.jpeg?imageMogr2/auto-orient%7CimageView2/2/w/236/q/70/format/avif"]}, {"n": "", "d": "May 19, 2026", "t": "I received it in perfect condition, no problems at all. I really liked it; it looks exactly like the photo and the product video... I can't wait to connect it and start using it so I can have cleaner shower water and get better quality water for washing my hair too.", "img": []}, {"n": "Diane Pettipas", "d": "Mar 30, 2026", "t": "Added this to our hard Kansas water. I could feel the difference in the water and it took my hat less time to rinse. I actually feel clean! I ordered extra filters at the same time.", "img": []}, {"n": "Samir Mammadov", "d": "Sep 25, 2025", "t": "I bought and installed it, everything was simple and easy. The smell of water in the shower disappeared, and the water seemed to become softer to the touch. I recommend it to everyone. I will need to order new filters later and replace them.", "img": []}, {"n": "Victor Thompson II", "d": "Jul 26, 2025", "t": "Been riding it for a few weeks now. Great filter!", "img": []}, {"n": "Jose Pimentel", "d": "Sep 27, 2025", "t": "Easy installation, fast delivery and well packaged. No leaks, just fallow the instructions and your done in les than five minutes.", "img": []}, {"n": "", "d": "Aug 10, 2025", "t": "It arrived very quickly. It's very good and easy to install.", "img": []}, {"n": "Thorn Dearing", "d": "Jan 10, 2026", "t": "I installed this right away it will take some time to know if it does what it claims but so far it’s installed", "img": []}, {"n": "Marsha Sands", "d": "Jan 10, 2026", "t": "this is the 2nd one I have purchased. they work great. our brown water is now clear and my skin has cleared up.", "img": []}, {"n": "", "d": "Mar 11, 2026", "t": "we loved it. I just noticed that the water from the shower became softer its different now, I'm so happy.", "img": []}, {"n": "", "d": "Oct 17, 2025", "t": "These are great quality, and true to size. I would recommend these if you're looking for stacking rings!!", "img": []}, {"n": "Yudith Aspiazu", "d": "Nov 28, 2025", "t": "I haven't used it yet, but it looks very good and of high quality. I hope it will fulfill its purpose", "img": []}, {"n": "Donald Pearson", "d": "Sep 20, 2025", "t": "Wow this thing is huge and feels very solid !! Im excited to see how well it works!", "img": []}, {"n": "Hector Galo", "d": "Jul 8, 2026", "t": "Very good. It does exactly what it promises, and installation was very easy. I've got 5 of them now.", "img": []}, {"n": "", "d": "Nov 22, 2025", "t": "Works great I can tell the difference 100000 X better", "img": []}, {"n": "", "d": "Nov 20, 2025", "t": "Good product, high quality, easy to install.", "img": []}, {"n": "", "d": "Oct 24, 2025", "t": "Works great! Water is nice and soft now.", "img": []}, {"n": "Cate W", "d": "May 5, 2026", "t": "Got this for my mom and they have strong calcium and other crap in their water. She is very pleased. Said that she doesnt have dry or itchy skin anymore. Awesome!", "img": []}, {"n": "Antonio Caetano Gomes", "d": "Apr 30, 2026", "t": "Very good item, I really liked it, and I recommend everyone to buy from this seller.", "img": []}, {"n": "", "d": "Jul 19, 2026", "t": "I will buy this item again I am very much impressed with the quality", "img": []}, {"n": "Vivian Garland", "d": "Jul 31, 2025", "t": "I love it! Definitely can tell the difference from before!", "img": []}, {"n": "Pedro Yáñez", "d": "Sep 16, 2025", "t": "My hair felt better and skin. Also smelt better and the water didn’t feel as weird", "img": []}, {"n": "", "d": "Jul 20, 2026", "t": "A NICE LOOKING FILTER IT ALSO CAME WITH A LARGE SPOOL OF TEFLON TAPE TO CREATE A TIGHT SEAL ON WATER LINE AND ON THE SHOWER HEAD,A VERY GOOD BUY", "img": []}, {"n": "Jordan Lowe", "d": "Jul 15, 2026", "t": "I keep filters on a regular basis. I was amazed with the softness of the water after not having a filter on the shower.", "img": []}, {"n": "", "d": "May 17, 2026", "t": "It's excellent! My hair and skin are healthier now", "img": []}, {"n": "Luz Mendez", "d": "Oct 1, 2025", "t": "Works great on reducing hard water and chemicals", "img": []}, {"n": "", "d": "Nov 9, 2024", "t": "It’s great! Reminds everyone that the washer must be used. Otherwise the water will leak out.", "img": []}, {"n": "Roxi Lagos", "d": "Jun 10, 2026", "t": "Easy install. Tried it today and the water wasn’t drying like usual. Could be placebo effect but I’m happy.", "img": []}, {"n": "Paul Wolfert", "d": "Mar 21, 2025", "t": "Good item works as described please with it", "img": []}, {"n": "Leonora Walton", "d": "Mar 30, 2026", "t": "This filter for the shower feels so much better and smell like fresh clean water. Will be getting filters when the time comes.", "img": []}, {"n": "", "d": "Oct 1, 2025", "t": "Haven’t tried it yet. It is hooked up and seems good quality. Will give it another star after I try it if all goes well. I just tried this filter. It works great.", "img": []}, {"n": "Ariana Queiroz", "d": "May 17, 2025", "t": "It arrived perfectly! I've already installed it and it works just fine.", "img": []}, {"n": "Alberto Ruiz Vindell", "d": "May 24, 2025", "t": "I think it's a very good product. That's why I'm giving it that rating. It arrived much faster than expected.", "img": []}, {"n": "", "d": "May 30, 2026", "t": "awesome easy hook up and seems to help with hard water.", "img": []}, {"n": "", "d": "May 25, 2026", "t": "Ever since I started using a shower filter, my skin and hair have improved dramatically. The water here in the US is very hard. This product has changed my life. It's very easy to install 🙏 Thank you!", "img": []}, {"n": "Bobby Stephens", "d": "Mar 1, 2026", "t": "works great just don't put it under pressure", "img": []}, {"n": "Elena Soto", "d": "Nov 19, 2024", "t": "easy set up and has all the required pieces. even has the tape.", "img": []}, {"n": "Gale Micheaux", "d": "Mar 11, 2025", "t": "great for the price, satisfied.thanks, nice:), awesome, love it, excellent bargain, perfect, this works very good, great for the price, satisfied.thanks", "img": []}, {"n": "Ebonii Lott", "d": "Jan 1, 2026", "t": "Just got it a couple of days ago but I think I can definitely tell a difference", "img": []}, {"n": "Diego Garcia Restrepo", "d": "Jun 28, 2025", "t": "As always, an excellent product. I've bought it several times to replace the others that need to be changed due to wear and tear.", "img": []}, {"n": "", "d": "Jul 22, 2026", "t": "My crazy daughter threw out my other new ones in a box. So glad I finally recd this one. We have hard water here in Utah so I need this filter for my severly itchy skin. Thanks Temu.", "img": []}, {"n": "Alex Medina", "d": "Aug 7, 2025", "t": "The product arrived in great condition, thank you very much. It's perfect.", "img": []}, {"n": "Marquies Adams", "d": "Jul 27, 2026", "t": "Work absolutely amazing. The water even fell chase major different. ￼", "img": []}, {"n": "", "d": "Mar 12, 2026", "t": "I just installed this filter and it was pretty simple and it seems to be working well.", "img": []}, {"n": "Unai Mendoza", "d": "May 4, 2025", "t": "Even the smallest details are taken care of 👍👌... It comes with its own Teflon and rubber to ensure a good seal and prevent leaks", "img": []}, {"n": "", "d": "Aug 4, 2026", "t": "It does a good job. It’s made of plastic, but it’s sturdy. When you install it, make sure to use the washers that come included. I didn’t, and I ended up having to redo the installation.", "img": []}]</script>
+  </section>
+
+  <div class="bvp-review-modal" data-bvp-review-modal hidden>
+    <div class="bvp-review-modal-scrim" data-bvp-review-close></div>
+    <div class="bvp-review-modal-card" role="dialog" aria-modal="true" aria-labelledby="bvp-review-form-title">
+      <button type="button" class="bvp-review-modal-x" data-bvp-review-close aria-label="Close">&times;</button>
+      <h3 id="bvp-review-form-title" class="bvp-serif">Share your shower.</h3>
+      {% form 'contact', class: 'bvp-review-form' %}
+        {% if form.posted_successfully? %}
+          <p class="bvp-review-thanks" data-bvp-review-posted>Thank you. Your review is in our inbox. We read and post every real one, usually within a day.</p>
+        {% else %}
+          <input type="hidden" name="contact[product]" value="{{ product.title | escape }}">
+          <label>Your name
+            <input type="text" name="contact[name]" autocomplete="name" required>
+          </label>
+          <label>Email <span class="bvp-review-quiet">(never shown)</span>
+            <input type="email" name="contact[email]" autocomplete="email" required>
+          </label>
+          <label>Your rating
+            <select name="contact[rating]">
+              <option value="5" selected>5 stars</option>
+              <option value="4">4 stars</option>
+              <option value="3">3 stars</option>
+              <option value="2">2 stars</option>
+              <option value="1">1 star</option>
+            </select>
+          </label>
+          <label>Your review
+            <textarea name="contact[body]" rows="5" required placeholder="What changed for your skin or hair?"></textarea>
+          </label>
+          <p class="bvp-review-quiet">Photos help other buyers. After you submit, reply to our confirmation email with your before and after shots and we will attach them.</p>
+          <button type="submit" class="bvp-atc bvp-atc--inline">Submit review</button>
+        {% endif %}
+      {% endform %}
+    </div>
+  </div>
+
+  {% # ================= FAQ ================= %}
+  <section class="bvp-faq" id="bvp-faq" aria-labelledby="bvp-faq-title">
+    <h2 id="bvp-faq-title" class="bvp-serif bvp-center">Fair questions.</h2>
+    <div class="bvp-faq-list">
+      <details>
+        <summary>Will it help my itchy, sensitive skin?</summary>
+        <p>That&rsquo;s who it&rsquo;s built for. Chlorine and sediment are the usual triggers behind post-shower itch, and this strips them out. Most people feel it in the first few showers.</p>
+      </details>
+      <details>
+        <summary>Will it fit my shower?</summary>
+        <p>It threads onto standard half inch shower arms, the fitting on nearly every US shower. If yours is the exception, send it back within 30 days.</p>
+      </details>
+      <details>
+        <summary>Will it change my water pressure?</summary>
+        <p>Most people notice no difference. A cartridge at the very end of its life can slow the flow, which is the clearest sign it&rsquo;s time to swap it.</p>
+      </details>
+      <details>
+        <summary>Do I need a plumber or tools?</summary>
+        <p>No. It installs by hand in about five minutes. Thread tape is included.</p>
+      </details>
+      <details>
+        <summary>How often do I replace the cartridge?</summary>
+        <p>About every three months. Replacements are always in stock here.</p>
+      </details>
+      <details>
+        <summary>When will I notice anything?</summary>
+        <p>The feel of the water changes from the first shower. Everything else depends on your water and your skin, which is exactly why the 30 day window exists.</p>
+      </details>
+      <details>
+        <summary>What if I want to return it?</summary>
+        <p>You have 30 days from delivery. Details in our <a href="/policies/refund-policy">return policy</a>.</p>
+      </details>
+    </div>
+  </section>
+
+  {% # ================= CLOSE ================= %}
+  <section class="bvp-close" aria-labelledby="bvp-close-title" style="background-image: linear-gradient(rgba(10, 37, 64, 0.55), rgba(10, 37, 64, 0.82)), url({{ 'bluvana-ritual-texture.webp' | asset_url }});">
+    <div class="bvp-close-inner">
+      <p class="bvp-close-eyebrow">The 30-day shower test</p>
+      <h2 id="bvp-close-title" class="bvp-serif">Calmer skin.<br>Or your money back.</h2>
+      <p class="bvp-close-sub">Shower with it for a month. If your skin and hair don&rsquo;t feel the difference, send it back and we refund every cent.</p>
+      <a class="bvp-atc bvp-atc--inline bvp-close-cta" href="#bv-buy">Choose your filter<span class="bvp-arrow" aria-hidden="true">&rarr;</span></a>
+      <ul class="bvp-close-proof" role="list">
+        <li>30-day money-back guarantee</li>
+        <li>Installs by hand in 5 minutes</li>
+        <li>Cartridge lasts about 3 months</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="bvp-stickybar" data-bvp-sticky hidden>
+    <div class="bvp-stickybar-info">
+      <span class="bvp-stickybar-name">{{ product.title }}</span>
+      <span class="bvp-stickybar-price" data-bvp-total-mirror>{{ product.selected_or_first_available_variant.price | money }}</span>
+    </div>
+    <button type="button" class="bvp-stickybar-atc" data-bvp-sticky-atc>Add to cart</button>
+  </div>
+
+  {% if bvp_cart3_variant %}
+    <script type="application/json" data-bvp-cart-variant>
+      {"id": {{ bvp_cart3_variant.id }}, "price": {{ bvp_cart3_variant.price }}, "available": {{ bvp_cart3_variant.available }}}
+    </script>
+  {% endif %}
+
+  <script type="application/json" data-bvp-variants>
+    [
+      {% assign ci0 = color_index | minus: 1 %}
+      {% for variant in product.variants %}
+        {
+          "id": {{ variant.id }},
+          "options": {{ variant.options | json }},
+          "price": {{ variant.price }},
+          "available": {% if product.handle == 'shower-filter' and ci0 >= 0 and variant.options[ci0] == 'Gold' %}false{% else %}{{ variant.available }}{% endif %},
+          "mediaId": {{ variant.featured_media.id | default: 'null' }}
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  </script>
+</div>
+
+{% schema %}
+{
+  "name": "Bluvana product page",
+  "tag": "section",
+  "class": "bluvana-product-section",
+  "settings": [],
+  "presets": [{ "name": "Bluvana product page" }]
+}
+{% endschema %}

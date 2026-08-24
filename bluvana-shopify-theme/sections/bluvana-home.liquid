@@ -1,0 +1,336 @@
+{{ 'bluvana-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bluvana-home.js' | asset_url }}" defer="defer"></script>
+
+{% liquid
+  assign shop_url = routes.all_products_collection_url
+
+  assign pro = section.settings.filter_product
+  if pro == blank
+    assign pro = all_products['shower-filter']
+  endif
+  assign pro_url = shop_url
+  if pro != blank
+    assign pro_url = pro.url
+  endif
+
+  assign refill = section.settings.cartridge_product
+  if refill == blank
+    assign refill = all_products['replacement-cartridges']
+  endif
+  assign refill_url = shop_url
+  if refill != blank
+    assign refill_url = refill.url
+  endif
+%}
+
+{% comment %}
+  Homepage rebuilt around the launch catalog: the Shower Filter Pro and its
+  replacement cartridges. The Aesop-style skeleton and section rhythm stay,
+  but every band now sells the filter story. New products slot in via the
+  editor settings below as the catalog grows.
+{% endcomment %}
+
+<div class="bv" data-bv>
+  {% # ---------- 1. HERO: full-viewport media carousel ---------- %}
+  <section class="bv-hero" aria-label="Featured">
+    <div class="bv-hero-track">
+      <div class="bv-hero-slide is-active" data-bv-slide>
+        <div class="bv-hero-media">
+          <video
+            src="{{ 'bluvana-hero.mp4' | asset_url }}"
+            poster="{{ 'bluvana-hero.webp' | asset_url }}"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label="Woman wrapping her hair in a towel and swaying in a small sunlit sage tiled bathroom"
+          ></video>
+          <div class="bv-hero-veil" aria-hidden="true"></div>
+        </div>
+        <div class="bv-hero-copy">
+          <p class="bv-hero-kicker">The Shower Filter Pro</p>
+          <h1 class="bv-hero-title">It&rsquo;s not your skin. It&rsquo;s your water.</h1>
+          <a class="bv-btn-outline bv-btn-outline--light" href="{{ pro_url }}">Shop the Shower Filter Pro<span class="bv-arrow" aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  {% # ---------- 2. VALUE STRIP ---------- %}
+  <ul class="bv-strip" role="list" aria-label="Why the Shower Filter Pro">
+    <li>20-stage cartridge</li>
+    <li>Installs by hand in 5 minutes</li>
+    <li>Free US shipping</li>
+    <li>30-day returns</li>
+  </ul>
+
+  {% # ---------- 3. THE PROBLEM: editorial split ---------- %}
+  <section class="bv-editorial" aria-labelledby="bv-problem-title">
+    <div class="bv-editorial-copy">
+      <p class="bv-note-label">The real culprit</p>
+      <h2 id="bv-problem-title" class="bv-serif-title">It&rsquo;s not sensitive skin. It&rsquo;s harsh water.</h2>
+      <p>Tight, itchy skin after every shower? Hair that feels like straw? That&rsquo;s the water, not you. The Shower Filter Pro catches what your pipes deliver before it ever touches you:</p>
+      <ul class="bv-catch-list" role="list">
+        <li><b>Chlorine</b> strips your skin&rsquo;s natural oils &mdash; hello, dry and itchy.</li>
+        <li><b>Rust flakes</b> from aging city pipes irritate sensitive skin.</li>
+        <li><b>Sediment</b> is fine grit that ends up clogging pores.</li>
+        <li><b>Limescale</b> coats hair and blocks moisture.</li>
+        <li><b>Heavy metals</b> get absorbed by your skin daily.</li>
+        <li><b>Odors</b> ride the hot steam you breathe in.</li>
+      </ul>
+      <a class="bv-btn-outline" href="{{ pro_url }}">See how it works<span class="bv-arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+    <div class="bv-editorial-media">
+      <div class="bv-editorial-stack">
+        <img class="bv-still" src="{{ 'bv-pro-hair-comb.jpg' | asset_url }}" width="1024" height="846" loading="lazy" alt="Hands combing through soft, wet hair after a shower">
+        <img class="bv-still" src="{{ 'bv-pro-life-black.jpg' | asset_url }}" width="1152" height="1728" loading="lazy" alt="Woman rinsing her hair under a matte black rain showerhead filtered by the Shower Filter Pro">
+      </div>
+      <img class="bv-still bv-still--fillcol" src="{{ 'bv-pro-life-silver.jpg' | asset_url }}" width="1152" height="1728" loading="lazy" alt="Woman washing her hair under a rain showerhead filtered by the chrome Shower Filter Pro">
+    </div>
+  </section>
+
+  {% # ---------- 4. PRODUCT SPOTLIGHT: Shower Filter Pro ---------- %}
+  <section class="bv-spotlight" aria-labelledby="bv-spotlight-title">
+    <div class="bv-spotlight-media">
+      <img class="bv-spotlight-img" src="{{ 'bv-pro-render-silver.jpg' | asset_url }}" width="1239" height="1270" loading="lazy" alt="Shower Filter Pro in polished chrome, studio view on a light sweep">
+      <img class="bv-spotlight-img bv-spotlight-img--alt" src="{{ 'bv-pro-render-black.jpg' | asset_url }}" width="1254" height="1254" loading="lazy" alt="Shower Filter Pro in matte black, studio view on a light sweep">
+    </div>
+    <div class="bv-spotlight-copy">
+      <p class="bv-hero-kicker">The first drop</p>
+      <h2 id="bv-spotlight-title" class="bv-finder-title">Shower Filter Pro</h2>
+      {% if pro != blank %}
+        <p class="bv-spotlight-price">From {{ pro.price | money }}</p>
+      {% endif %}
+      <ul class="bv-spotlight-claims" role="list">
+        <li>Stops the post-shower itch from the very first shower.</li>
+        <li>20 stages catch the chlorine, rust and sediment behind it.</li>
+        <li>Threads onto any standard shower arm &mdash; keeps the showerhead you own.</li>
+        <li>Calmer skin in 30 days, or your money back.</li>
+      </ul>
+      <a class="bv-btn-outline bv-btn-outline--light" href="{{ pro_url }}">Shop the Shower Filter Pro<span class="bv-arrow" aria-hidden="true">&rarr;</span></a>
+      <p class="bv-spotlight-note">Shown in chrome. Also in matte black. Gold is currently sold out.</p>
+    </div>
+  </section>
+
+  {% # ---------- 5. THE NUMBERS ---------- %}
+  <section class="bv-numbers" aria-labelledby="bv-numbers-title">
+    <header class="bv-center-head">
+      <p class="bv-note-label">Inside the cartridge</p>
+      <h2 id="bv-numbers-title" class="bv-serif-title">Most shower filters have two stages. This one has twenty.</h2>
+      <p>A $20 filter is one screen and a spoonful of carbon. Twenty stages means genuinely different water on your skin.</p>
+    </header>
+    <div class="bv-numbers-body">
+      <div class="bv-bars" role="img" aria-label="Comparison: a typical shower filter has one to two filtration stages, the Shower Filter Pro has twenty">
+        <div class="bv-bar-row">
+          <span class="bv-bar-name">Typical filter</span>
+          <span class="bv-bar"><span class="bv-bar-fill bv-bar-fill--other" style="width: 8%"></span></span>
+          <span class="bv-bar-val">1 to 2 stages</span>
+        </div>
+        <div class="bv-bar-row">
+          <span class="bv-bar-name">Shower Filter Pro</span>
+          <span class="bv-bar"><span class="bv-bar-fill bv-bar-fill--ours" style="width: 100%"></span></span>
+          <span class="bv-bar-val">20 stages</span>
+        </div>
+      </div>
+      <div class="bv-num-cards">
+        <div class="bv-num-card">
+          <p class="bv-num-lead">Installs by hand in</p>
+          <span class="bv-big-num">5<span class="bv-big-unit"> min</span></span>
+          <p class="bv-num-sub">No tools, no plumber. Thread tape is in the box.</p>
+        </div>
+        <div class="bv-num-card">
+          <p class="bv-num-lead">One cartridge lasts about</p>
+          <span class="bv-big-num">3<span class="bv-big-unit"> mo</span></span>
+          <p class="bv-num-sub">Ninety days of filtered showers, then it swaps out in seconds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% # ---------- 6. STEAM FEATURE: video band ---------- %}
+  <section class="bv-feature bv-feature--full" aria-labelledby="bv-feature-title">
+    <div class="bv-feature-media">
+      <video
+        class="bv-feature-video"
+        src="{{ 'bluvana-feature-mirror.mp4' | asset_url }}"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-label="A hand wiping one clean arc across a steamed bathroom mirror in a sage tiled room"
+      ></video>
+      <div class="bv-feature-shade" aria-hidden="true"></div>
+      <div class="bv-feature-caption">
+        <p class="bv-hero-kicker">That pool smell in the steam</p>
+        <h2 id="bv-feature-title" class="bv-feature-title">Every hot shower turns chlorine into vapor.</h2>
+        <a class="bv-btn-outline bv-btn-outline--light" href="{{ pro_url }}">Filter it at the source<span class="bv-arrow" aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+  </section>
+
+  {% # ---------- 7. BEFORE / AFTER PROOF ---------- %}
+  <section class="bv-proof" aria-labelledby="bv-proof-title">
+    <header class="bv-center-head">
+      <h2 id="bv-proof-title" class="bv-serif-title">Calm skin, from the very first shower.</h2>
+      <p>From verified purchases of this exact filter. Bluvana reviews join them as they arrive.</p>
+    </header>
+    <div class="bv-proof-scroll" role="list">
+      <figure class="bv-proof-tile" role="listitem">
+        <img src="{{ 'bv-pro-ba-skin.jpg' | asset_url }}" width="1254" height="1254" loading="lazy" alt="Before and after: irritated, breaking-out cheek on the left, calm clear skin on the right">
+        <figcaption>&ldquo;The skin feels so soft, and the itching I had for so long is gone.&rdquo;<span class="bv-proof-who">Olga V. &middot; Verified buyer</span></figcaption>
+      </figure>
+      <figure class="bv-proof-tile" role="listitem">
+        <img src="{{ 'bv-pro-ba-hair.jpg' | asset_url }}" width="1254" height="1254" loading="lazy" alt="Before and after: dull frizzy hair on the left, soft glossy waves on the right">
+        <figcaption>&ldquo;My hair feels softer, not like a Brillo pad anymore.&rdquo;<span class="bv-proof-who">Rachel D. &middot; Verified buyer</span></figcaption>
+      </figure>
+      <figure class="bv-proof-tile" role="listitem">
+        <img src="{{ 'bvp-proof-skin-front.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after: red, breaking-out skin on the left, calm clear skin on the right">
+        <figcaption>&ldquo;This has made my hair and skin soft and stopped the peeling. Acne is drastically reduced.&rdquo;<span class="bv-proof-who">Vanessa R. &middot; Verified buyer</span></figcaption>
+      </figure>
+      <figure class="bv-proof-tile" role="listitem">
+        <img src="{{ 'bvp-proof-skin-glow.jpg' | asset_url }}" width="1200" height="1200" loading="lazy" alt="Before and after: blotchy irritated skin on the left, clear glowing skin on the right">
+        <figcaption>&ldquo;Noticeable difference. Skin is softer, skin feels cleaner, hair is less frizzy.&rdquo;<span class="bv-proof-who">K. Olivarez &middot; Verified buyer</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {% # ---------- 8. INSTALL STEPS ---------- %}
+  <section class="bv-steps" aria-labelledby="bv-steps-title">
+    <header class="bv-center-head">
+      <p class="bv-note-label">Five minutes, by hand</p>
+      <h2 id="bv-steps-title" class="bv-serif-title">Installed before the water warms up.</h2>
+    </header>
+    <ol class="bv-steps-grid" role="list">
+      <li class="bv-step">
+        <span class="bv-step-num" aria-hidden="true">1</span>
+        <h3 class="bv-set-name">Unscrew your showerhead</h3>
+        <p class="bv-step-desc">It twists off by hand. No tools needed at any point.</p>
+      </li>
+      <li class="bv-step">
+        <span class="bv-step-num" aria-hidden="true">2</span>
+        <h3 class="bv-set-name">Thread the filter on</h3>
+        <p class="bv-step-desc">Onto the shower arm, hand tight. Thread tape is in the box.</p>
+      </li>
+      <li class="bv-step">
+        <span class="bv-step-num" aria-hidden="true">3</span>
+        <h3 class="bv-set-name">Reattach and flush</h3>
+        <p class="bv-step-desc">Showerhead back on, run hot water for one minute. Done.</p>
+      </li>
+    </ol>
+    <div class="bv-steps-cta">
+      <a class="bv-btn-dark" href="{{ pro_url }}">Shop the Shower Filter Pro</a>
+    </div>
+  </section>
+
+  {% # ---------- 9. REPLACEMENT CARTRIDGES ---------- %}
+  <section class="bv-finder" aria-labelledby="bv-refill-title">
+    <div class="bv-finder-copy">
+      <p class="bv-hero-kicker">Keep it working</p>
+      <h2 id="bv-refill-title" class="bv-finder-title">Replacement Cartridges</h2>
+      <p>One cartridge is about three months of filtered showers. When the time comes it twists out and a fresh one drops in &mdash; seconds, no tools. Singles or a year&rsquo;s worth in a 3-pack.</p>
+      {% if refill != blank %}
+        <p class="bv-spotlight-price">From {{ refill.price | money }}</p>
+      {% endif %}
+      <a class="bv-btn-outline bv-btn-outline--light" href="{{ refill_url }}">Stock up on cartridges<span class="bv-arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+    <div class="bv-finder-media">
+      <img class="bv-still bv-still--fill" src="{{ 'bvp-render-inline-crop.jpg' | asset_url }}" width="1600" height="1200" loading="lazy" alt="Cutaway of the 20-stage replacement cartridge showing the layers of filtration media inside">
+    </div>
+  </section>
+
+  {% # ---------- 10. GUARANTEE BAND ---------- %}
+  <section class="bv-guarantee" aria-labelledby="bv-guarantee-title">
+    <p class="bv-hero-kicker">The 30-day shower test</p>
+    <h2 id="bv-guarantee-title" class="bv-serif-title">Calmer skin. Or your money back.</h2>
+    <p>Shower with it for a month. If your skin and hair don&rsquo;t feel the difference, send it back and we refund every cent.</p>
+    <a class="bv-btn-outline" href="{{ pro_url }}">Start the 30 days<span class="bv-arrow" aria-hidden="true">&rarr;</span></a>
+  </section>
+
+  {% # ---------- 11. FAQ ---------- %}
+  <section class="bv-faq" aria-labelledby="bv-faq-title">
+    <header class="bv-center-head">
+      <h2 id="bv-faq-title" class="bv-serif-title">Fair questions.</h2>
+    </header>
+    <div class="bv-faq-list">
+      <details>
+        <summary>Will it help my itchy, sensitive skin?</summary>
+        <p>That&rsquo;s who it&rsquo;s built for. Chlorine and sediment are the usual triggers behind post-shower itch, and this strips them out. Most people feel it in the first few showers.</p>
+      </details>
+      <details>
+        <summary>Will it fit my shower?</summary>
+        <p>It threads onto standard half inch shower arms, the fitting on nearly every US shower. If yours is the exception, send it back within 30 days.</p>
+      </details>
+      <details>
+        <summary>Will it change my water pressure?</summary>
+        <p>Most people notice no difference. A cartridge at the very end of its life can slow the flow, which is the clearest sign it&rsquo;s time to swap it.</p>
+      </details>
+      <details>
+        <summary>Do I need a plumber or tools?</summary>
+        <p>No. It installs by hand in about five minutes. Thread tape is included.</p>
+      </details>
+      <details>
+        <summary>How often do I replace the cartridge?</summary>
+        <p>About every three months. Replacements are always in stock here.</p>
+      </details>
+      <details>
+        <summary>When will I notice anything?</summary>
+        <p>The feel of the water changes from the first shower. Everything else depends on your water and your skin, which is exactly why the 30 day window exists.</p>
+      </details>
+    </div>
+  </section>
+
+  {% # ---------- 12. WHAT'S NEXT + SUBSCRIBE ---------- %}
+  <section class="bv-close" id="bv-subscribe" aria-label="New products and subscription">
+    <ul class="bv-values" role="list">
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="10" width="14" height="10" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        Secure checkout
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4c3 3.5 4.5 6 4.5 8.2A4.4 4.4 0 0 1 12 16.5a4.4 4.4 0 0 1-4.5-4.3C7.5 10 9 7.5 12 4Z"/></svg>
+        Free US shipping
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.2 4.8h2.6l1.3 3.2-1.6 1.3a10.4 10.4 0 0 0 4.5 4.5l1.3-1.6 3.2 1.3v2.6a1.6 1.6 0 0 1-1.8 1.6A13.2 13.2 0 0 1 3.6 6.5a1.6 1.6 0 0 1 1.6-1.7Z"/></svg>
+        Real human support
+      </li>
+    </ul>
+    <div class="bv-soon">
+      <p class="bv-note-label">More is coming</p>
+      <h2 class="bv-serif-title">The filter is first.</h2>
+      <p>Bluvana is building a full edit of better products for small bathrooms. The Shower Filter Pro leads the way &mdash; join the list and hear about new pieces before anyone else.</p>
+    </div>
+    <div class="bv-subscribe">
+      <p class="bv-subscribe-label">Subscribe to Bluvana communications</p>
+      {% form 'customer', class: 'bv-subscribe-form' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label class="visually-hidden" for="bv-email-{{ section.id }}">Email address</label>
+        <input id="bv-email-{{ section.id }}" type="email" name="contact[email]" value="{{ form.email }}" autocomplete="email" placeholder="Email address" required>
+        <button class="bv-btn-dark" type="submit">Subscribe</button>
+        {% if form.posted_successfully? %}
+          <p class="bv-form-status" role="status">You&rsquo;re on the list. Welcome in.</p>
+        {% endif %}
+        {% if form.errors %}
+          <div class="bv-form-status bv-form-status--error" role="alert">{{ form.errors | default_errors }}</div>
+        {% endif %}
+      {% endform %}
+    </div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Bluvana homepage",
+  "tag": "section",
+  "class": "bluvana-home-section",
+  "settings": [
+    { "type": "product", "id": "filter_product", "label": "Shower Filter Pro product" },
+    { "type": "product", "id": "cartridge_product", "label": "Replacement cartridge product" }
+  ],
+  "presets": [{ "name": "Bluvana homepage" }]
+}
+{% endschema %}

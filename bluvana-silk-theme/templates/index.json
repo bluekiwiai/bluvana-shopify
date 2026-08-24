@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "silk_home": {
+      "type": "silk-home",
+      "settings": {
+        "category_names": "Long Sleeve Sets|Short Sets|Slip Dresses|Robes|Lace Trim|Sets",
+        "category_assets": "silk-cat-1.png|silk-cat-2.png|silk-cat-3.png|silk-cat-4.png|silk-cat-5.png|silk-cat-6.png"
+      }
+    }
+  },
+  "order": [
+    "silk_home"
+  ]
+}

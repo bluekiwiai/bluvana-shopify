@@ -1,0 +1,313 @@
+{{ 'silk-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'silk-home.js' | asset_url }}" defer="defer"></script>
+
+{% liquid
+  assign shop_url = routes.all_products_collection_url
+  assign cat_names = section.settings.category_names | split: '|'
+  assign cat_links = section.settings.category_links | split: '|'
+  assign cat_assets = section.settings.category_assets | split: '|'
+%}
+
+{% comment %}
+  Bluvana Silk homepage. Clothing only.
+  Order is deliberate: make the argument once, let people self sort, prove the
+  claim with a picture rather than a paragraph, then merchandise, then reassure.
+  Every media slot falls back to a placeholder carrying its own shot brief.
+{% endcomment %}
+
+<div class="sk" data-sk>
+  {%- comment -%} ---------- 1. HERO ---------- {%- endcomment -%}
+  <section class="sk-hero" aria-label="Featured">
+    <div class="sk-hero__in">
+      <div class="sk-hero__media">
+        {%- if section.settings.hero_image != blank -%}
+          <img src="{{ section.settings.hero_image | image_url: width: 2400 }}" alt="{{ section.settings.hero_image.alt | escape }}" width="2400" height="1350" fetchpriority="high">
+        {%- elsif section.settings.hero_video != blank -%}
+          {{ section.settings.hero_video | video_tag: image_size: '2000x', autoplay: true, loop: true, muted: true, controls: false, playsinline: true }}
+        {%- else -%}
+          <video
+            src="{{ 'silk-hero.mp4' | asset_url }}"
+            poster="{{ 'silk-hero-poster.jpg' | asset_url }}"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            data-sk-hero-video
+            aria-label="Woman in a silk camisole set and robe turning in a bright kitchen"
+          ></video>
+        {%- endif -%}
+        <div class="sk-hero__scrim" aria-hidden="true"></div>
+      </div>
+
+      <div class="sk-hero__copy">
+        <h1 class="sk-disp sk-hero__t">
+          {{ section.settings.hero_line_1 | default: 'Silk is sold by weight.' }}<br>
+          <em>{{ section.settings.hero_line_2 | default: 'Nobody tells you theirs.' }}</em>
+        </h1>
+        <div class="sk-hero__cta">
+          <a class="sk-btn" href="{{ section.settings.hero_link | default: shop_url }}">Shop pajamas</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {%- comment -%} ---------- 2. CATEGORY SHELF ---------- {%- endcomment -%}
+  <section class="sk-shelf" aria-label="Shop by category">
+    <ul class="sk-shelf__row">
+      {%- for name in cat_names -%}
+        {%- assign idx = forloop.index0 -%}
+        {%- assign img_key = 'cat_image_' | append: forloop.index -%}
+        {%- assign cat_img = section.settings[img_key] -%}
+        <li>
+          <a class="sk-shelf__a" href="{{ cat_links[idx] | default: shop_url }}">
+            <span class="sk-shelf__m">
+              {%- assign asset_name = cat_assets[idx] | strip -%}
+              {%- if cat_img != blank -%}
+                <img src="{{ cat_img | image_url: width: 560 }}" alt="{{ name | strip }}" loading="lazy" width="280" height="280">
+              {%- elsif asset_name != blank -%}
+                <img src="{{ asset_name | asset_url }}" alt="{{ name | strip }}" loading="lazy" width="280" height="280">
+              {%- else -%}
+                {% render 'silk-shape', idx: idx %}
+              {%- endif -%}
+            </span>
+            <span class="sk-shelf__n">{{ name | strip }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+
+  {%- comment -%} ---------- 3. ROUGE PANEL ---------- {%- endcomment -%}
+  <section class="sk-panel" aria-label="Why heavy silk">
+    <div class="sk-panel__in">
+      <div class="sk-panel__copy">
+        <h2 class="sk-disp sk-panel__t">
+          {{ section.settings.panel_line_1 | default: 'Shop what is trending' }}<br>
+          {{ section.settings.panel_line_2 | default: 'in 2026.' }}
+        </h2>
+        <p class="sk-panel__p">
+          {{ section.settings.panel_body | default: 'The pieces moving fastest this season.' }}
+        </p>
+        <div>
+          <a class="sk-btn sk-btn--caps" href="{{ section.settings.panel_link | default: shop_url }}">
+            {{ section.settings.panel_cta | default: 'Shop now' }}
+            <svg class="sk-btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h14"/><path d="m12.5 6 6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="sk-panel__fig">
+        {%- if section.settings.panel_image != blank -%}
+          <img src="{{ section.settings.panel_image | image_url: width: 1000 }}" alt="{{ section.settings.panel_image.alt | escape }}" width="760" height="1490" loading="lazy">
+        {%- else -%}
+          <img src="{{ 'silk-wave-figure.png' | asset_url }}" alt="{{ section.settings.panel_alt | default: 'Woman in a green silk camisole set' | escape }}" width="760" height="1490" loading="lazy">
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+
+  {%- comment -%} ---------- 4. PRODUCT GRID ---------- {%- endcomment -%}
+  <section class="sk-index" aria-label="Best sellers">
+    <div class="sk-index__in">
+      <div class="sk-head2">
+        <h2 class="sk-disp sk-head2__t">Best sellers</h2>
+      </div>
+
+      <div class="sk-grid">
+        {%- if section.settings.rail_collection != blank and section.settings.rail_collection.products_count > 0 -%}
+          {%- for product in section.settings.rail_collection.products limit: 8 -%}
+            {% render 'silk-product-card', product: product %}
+          {%- endfor -%}
+        {%- else -%}
+          {%- assign ph = 'Colette Pajama Set;$149;#a81b34,#e8e3dc,#2a2725,#25473a|Aubade Robe;$129;#e8e3dc,#a81b34,#dcd6d0|Marceau Pajama Set;$155;#2a2725,#111010,#a81b34|Weekend Short Set;$99;#a81b34,#e8e3dc|Nina Camisole Set;$89;#e8e3dc,#dcd6d0,#a81b34|Gabrielle Kimono;$139;#a81b34,#2a2725,#25473a|The His and Hers Set;$279;#a81b34,#e8e3dc|The Gift Box;$189;#a81b34,#111010' | split: '|' -%}
+          {%- for row in ph -%}
+            {%- assign p = row | split: ';' -%}
+            {% render 'silk-product-card', ph_title: p[0], ph_price: p[1], ph_swatches: p[2] %}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+      <div class="sk-index__more">
+        <a class="sk-btn sk-btn--out" href="{{ shop_url }}">Shop everything</a>
+      </div>
+    </div>
+  </section>
+
+  {%- comment -%} ---------- 5. LOGO BAND ---------- {%- endcomment -%}
+  {%- if section.settings.band_show -%}
+    {%- assign band_bg = section.settings.band_bg | default: '#a81b34' -%}
+    <section class="sk-band" style="--band-bg: {{ band_bg }}; --band-h: {{ section.settings.band_height | default: 140 }}px;" aria-hidden="true">
+      <div class="sk-band__track">
+        {%- for pass in (1..2) -%}
+          {%- for i in (1..12) -%}
+            <img src="{{ 'silk-wordmark-light.png' | asset_url }}" alt="" width="542" height="180" loading="lazy" draggable="false">
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ---------- 5. LOOKBOOK STRIP ---------- {%- endcomment -%}
+  <section class="sk-line" aria-label="Lookbook">
+    <div class="sk-line__in">
+      <div class="sk-head2">
+        <h2 class="sk-disp sk-head2__t">
+          {{ section.settings.line_pre | default: 'The' }}
+          <span class="sk-script sk-squig">{{ section.settings.line_mark | default: 'Camille Hartworth' }}</span>
+          {{ section.settings.line_post | default: 'line just landed.' }}
+        </h2>
+      </div>
+    </div>
+
+    <div class="sk-line__viewport" data-sk-strip>
+      <button class="sk-line__arrow sk-line__arrow--prev" type="button" data-sk-strip-prev aria-label="Previous photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+      </button>
+
+      <ul class="sk-line__track" data-sk-strip-track>
+        {%- assign shots = section.settings.line_assets | default: 'silk-line-1.jpg|silk-line-2.jpg|silk-line-3.jpg|silk-line-4.jpg|silk-line-5.jpg|silk-line-6.jpg' | split: '|' -%}
+        {%- for shot in shots -%}
+          {%- assign name = shot | strip -%}
+          {%- if name != blank -%}
+            <li class="sk-line__cell">
+              <img src="{{ name | asset_url }}" alt="{{ section.settings.line_alt | default: 'Camille Hartworth silk set' | escape }}" width="900" height="1350" loading="lazy" draggable="false">
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+
+        <li class="sk-line__cell sk-line__cell--end">
+          <a class="sk-line__end" href="{{ section.settings.line_link | default: shop_url }}">
+            <span class="sk-line__end-name">{{ section.settings.line_product | default: 'The Camille Set' }}</span>
+            <span class="sk-line__end-price">{{ section.settings.line_price | default: '$89' }}</span>
+            <span class="sk-line__end-go">
+              Shop now
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h14"/><path d="m12.5 6 6 6-6 6"/></svg>
+            </span>
+          </a>
+        </li>
+      </ul>
+
+      <button class="sk-line__arrow sk-line__arrow--next" type="button" data-sk-strip-next aria-label="Next photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div class="sk-line__in sk-line__foot">
+      <p class="sk-line__count" data-sk-strip-count aria-hidden="true"><span data-sk-strip-now>01</span> / 06</p>
+      <a class="sk-btn sk-btn--caps" href="{{ section.settings.line_link | default: shop_url }}">
+        {{ section.settings.line_cta | default: 'Shop the Camille Hartworth line' }}
+        <svg class="sk-btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h14"/><path d="m12.5 6 6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+  {%- comment -%} ---------- 6. TWO AUTO ROTATING RAILS ---------- {%- endcomment -%}
+  {% render 'silk-rail',
+    rid: 'sleep',
+    title: section.settings.rail1_title | default: 'The <span class="sk-script">Camille Hartworth</span> sleep edit',
+    collection: section.settings.rail1_collection,
+    link: section.settings.rail1_link,
+    cta: section.settings.rail1_cta | default: 'Shop sleepwear'
+  %}
+
+  {% render 'silk-rail',
+    rid: 'sets',
+    title: section.settings.rail2_title | default: 'Matching sets, top to toe',
+    collection: section.settings.rail2_collection,
+    link: section.settings.rail2_link,
+    cta: section.settings.rail2_cta | default: 'Shop the sets'
+  %}
+
+  {%- comment -%} ---------- 7. QUOTE ---------- {%- endcomment -%}
+  <section class="sk-quote" aria-label="On silk">
+    <div class="sk-quote__in">
+      <span class="sk-quote__ghost" aria-hidden="true">
+        <img src="{{ 'silk-wordmark-light.png' | asset_url }}" alt="" width="542" height="180" loading="lazy">
+      </span>
+      <span class="sk-quote__mark" aria-hidden="true">
+        <svg viewBox="0 0 120 12" preserveAspectRatio="none" focusable="false">
+          <path d="M0 8 Q 7.5 1 15 8 T 30 8 T 45 8 T 60 8 T 75 8 T 90 8 T 105 8 T 120 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <p class="sk-disp sk-quote__t">
+        {{ section.settings.quote_line_1 | default: 'A good silk gets softer.' }}<br>
+        {{ section.settings.quote_line_2 | default: 'A cheap one just gets older.' }}
+      </p>
+      <p class="sk-quote__by">{{ section.settings.quote_by | default: 'Every piece, every color' }}</p>
+    </div>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Silk home",
+  "settings": [
+    { "type": "header", "content": "Hero" },
+    { "type": "text", "id": "hero_line_1", "label": "Headline line 1", "default": "Silk is sold by weight." },
+    { "type": "text", "id": "hero_line_2", "label": "Headline line 2 (rouge)", "default": "Nobody tells you theirs." },
+    { "type": "video", "id": "hero_video", "label": "Hero video (falls back to silk-hero.mp4)" },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero image (overrides video)" },
+    { "type": "url", "id": "hero_link", "label": "Button link" },
+
+    { "type": "header", "content": "Category shelf" },
+    { "type": "textarea", "id": "category_names", "label": "Category names (pipe separated)", "default": "Long Sleeve Sets|Short Sets|Slip Dresses|Robes|Lace Trim|Sets" },
+    { "type": "textarea", "id": "category_links", "label": "Category links (pipe separated)" },
+    { "type": "textarea", "id": "category_assets", "label": "Category cut out asset filenames (pipe separated)", "default": "silk-cat-1.png|silk-cat-2.png|silk-cat-3.png|silk-cat-4.png|silk-cat-5.png|silk-cat-6.png" },
+    { "type": "image_picker", "id": "cat_image_1", "label": "Category 1 cut out" },
+    { "type": "image_picker", "id": "cat_image_2", "label": "Category 2 cut out" },
+    { "type": "image_picker", "id": "cat_image_3", "label": "Category 3 cut out" },
+    { "type": "image_picker", "id": "cat_image_4", "label": "Category 4 cut out" },
+    { "type": "image_picker", "id": "cat_image_5", "label": "Category 5 cut out" },
+    { "type": "image_picker", "id": "cat_image_6", "label": "Category 6 cut out" },
+
+    { "type": "header", "content": "Rouge panel" },
+    { "type": "text", "id": "panel_line_1", "label": "Headline line 1", "default": "Shop what is trending" },
+    { "type": "text", "id": "panel_line_2", "label": "Headline line 2", "default": "in 2026." },
+    { "type": "text", "id": "panel_body", "label": "Body", "default": "The pieces moving fastest this season." },
+    { "type": "text", "id": "panel_cta", "label": "Button label", "default": "Shop now" },
+    { "type": "url", "id": "panel_link", "label": "Button link" },
+    { "type": "image_picker", "id": "panel_image", "label": "Figure (cut out PNG)" },
+    { "type": "text", "id": "panel_alt", "label": "Figure alt text", "default": "Woman in a green silk camisole set" },
+
+    { "type": "header", "content": "Best sellers" },
+    { "type": "collection", "id": "rail_collection", "label": "Collection" },
+
+    { "type": "header", "content": "Logo band" },
+    { "type": "checkbox", "id": "band_show", "label": "Show logo band", "default": true },
+    { "type": "color", "id": "band_bg", "label": "Band background", "default": "#a81b34" },
+    { "type": "range", "id": "band_height", "label": "Band height", "min": 90, "max": 220, "step": 10, "unit": "px", "default": 140 },
+
+    { "type": "header", "content": "Lookbook strip" },
+    { "type": "text", "id": "line_pre", "label": "Headline before the mark", "default": "The" },
+    { "type": "text", "id": "line_mark", "label": "Underlined words", "default": "Camille Hartworth" },
+    { "type": "text", "id": "line_post", "label": "Headline after the mark", "default": "line just landed." },
+    { "type": "textarea", "id": "line_assets", "label": "Photo filenames (pipe separated)", "default": "silk-line-1.jpg|silk-line-2.jpg|silk-line-3.jpg|silk-line-4.jpg|silk-line-5.jpg|silk-line-6.jpg" },
+    { "type": "text", "id": "line_alt", "label": "Photo alt text", "default": "Camille Hartworth silk set" },
+    { "type": "text", "id": "line_cta", "label": "Button label", "default": "Shop the Camille Hartworth line" },
+    { "type": "url", "id": "line_link", "label": "Button link" },
+    { "type": "text", "id": "line_product", "label": "End card product name", "default": "The Camille Set" },
+    { "type": "text", "id": "line_price", "label": "End card price", "default": "$89" },
+
+
+
+    { "type": "header", "content": "Rail one" },
+    { "type": "text", "id": "rail1_title", "label": "Title", "default": "The Camille Hartworth sleep edit" },
+    { "type": "collection", "id": "rail1_collection", "label": "Collection" },
+    { "type": "text", "id": "rail1_cta", "label": "Button label", "default": "Shop sleepwear" },
+    { "type": "url", "id": "rail1_link", "label": "Button link" },
+
+    { "type": "header", "content": "Rail two" },
+    { "type": "text", "id": "rail2_title", "label": "Title", "default": "Matching sets, top to toe" },
+    { "type": "collection", "id": "rail2_collection", "label": "Collection" },
+    { "type": "text", "id": "rail2_cta", "label": "Button label", "default": "Shop the sets" },
+    { "type": "url", "id": "rail2_link", "label": "Button link" },
+
+    { "type": "header", "content": "Quote" },
+    { "type": "text", "id": "quote_line_1", "label": "Line 1", "default": "A good silk gets softer." },
+    { "type": "text", "id": "quote_line_2", "label": "Line 2", "default": "A cheap one just gets older." },
+    { "type": "text", "id": "quote_by", "label": "Line under the quote", "default": "Every piece, every color" }
+  ],
+  "presets": [{ "name": "Silk home" }]
+}
+{% endschema %}

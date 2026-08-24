@@ -1,0 +1,15 @@
+{%- comment -%}
+  Designed placeholder. Carries its shot brief so the photography list travels
+  with the layout instead of living in a separate document.
+  tone: dark | paper | pine
+{%- endcomment -%}
+
+<span class="sk-ph sk-ph--{{ tone | default: 'paper' }}">
+  <span class="sk-ph__t">
+    <span class="sk-ph__pill">Placeholder</span>
+    <span class="sk-ph__k">{{ label }}</span>
+    {%- if note != blank -%}
+      <span class="sk-ph__n">{{ note }}</span>
+    {%- endif -%}
+  </span>
+</span>

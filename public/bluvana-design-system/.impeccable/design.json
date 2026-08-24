@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-14T12:00:00-07:00",
+  "title": "Design System: Bluvana",
+  "extensions": {
+    "colorMeta": {
+      "ocean-blue": { "role": "primary", "displayName": "Ocean Blue", "tonalRamp": ["#0b1d20", "#12343a", "#1a454e", "#1f5661", "#4a747c", "#78949a", "#b0c0c3", "#edf2f1"] },
+      "deep-tile-green": { "role": "primary", "displayName": "Deep Tile Green", "tonalRamp": ["#0c1711", "#18281f", "#20372a", "#294536", "#597063", "#89978f", "#bcc5bf", "#eff2f0"] },
+      "sun-gold": { "role": "tertiary", "displayName": "Sun Gold", "tonalRamp": ["#33250d", "#634718", "#a07831", "#e6b864", "#ebc881", "#f0d9a5", "#f6e9ce", "#fcf8ed"] },
+      "mineral-ivory": { "role": "neutral", "displayName": "Mineral Ivory", "tonalRamp": ["#25231f", "#454139", "#6b6559", "#948d7e", "#bbb4a5", "#d8d1c4", "#f5f0e5", "#fffdfa"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "tonalRamp": ["#0c120e", "#18231c", "#334039", "#58645d", "#818b85", "#abb3ae", "#d6dbd8", "#f5f7f6"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Editorial Display", "purpose": "Hero and section statements only." },
+      "body": { "displayName": "Plain-spoken Body", "purpose": "Explanations, product guidance and commerce copy." },
+      "utility": { "displayName": "Utility Label", "purpose": "Navigation, filters, dimensions and metadata." }
+    },
+    "shadows": [
+      { "name": "product-grounding", "value": "20px 28px 34px rgba(24,35,28,.22)", "purpose": "Place a physical product on a photographed or illustrated surface." },
+      { "name": "toast-lift", "value": "0 18px 40px rgba(24,35,28,.24)", "purpose": "Lift short-lived system feedback above the page." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Navigation, feedback and image-treatment transitions." }
+    ],
+    "breakpoints": [
+      { "name": "rail-stack", "value": "980px" },
+      { "name": "mobile", "value": "660px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The decisive action on dark or green fields.",
+      "html": "<button class=\"ds-btn-primary\">SHOP SMALL-SPACE PICKS <svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 20px;border:0;border-radius:9px;background:var(--gold,#e6b864);color:var(--ink,#18231c);font:700 14px Archivo,sans-serif;cursor:pointer;transition:filter .25s cubic-bezier(.16,1,.3,1)}.ds-btn-primary svg{width:18px;fill:none;stroke:currentColor;stroke-width:2}.ds-btn-primary:hover{filter:brightness(1.06)}.ds-btn-primary:focus-visible{outline:3px solid var(--gold,#e6b864);outline-offset:4px}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "description": "A compact treatment or catalog filter.",
+      "html": "<button class=\"ds-chip\">SOFT DAYLIGHT</button>",
+      "css": ".ds-chip{min-height:40px;padding:0 16px;border:1px solid rgba(24,35,28,.22);border-radius:999px;background:transparent;color:var(--ink,#18231c);font:600 12px Archivo,sans-serif;cursor:pointer}.ds-chip:hover,.ds-chip[aria-pressed=\"true\"]{background:var(--ink,#18231c);color:#fff}.ds-chip:focus-visible{outline:3px solid var(--gold,#e6b864);outline-offset:3px}"
+    },
+    {
+      "name": "Cabinet Navigation",
+      "kind": "nav",
+      "description": "Sticky green navigation with a gold active state.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\">Color</a><a class=\"active\" href=\"#\">Photography</a><a href=\"#\">Products</a></nav>",
+      "css": ".ds-nav{display:grid;gap:2px;padding:20px;background:var(--green,#294536)}.ds-nav a{padding:9px 10px;border-radius:8px;color:#e9eadc;font:700 12px Archivo,sans-serif;text-decoration:none}.ds-nav a:hover,.ds-nav a.active{background:var(--gold,#e6b864);color:var(--ink,#18231c)}.ds-nav a:focus-visible{outline:3px solid var(--gold,#e6b864);outline-offset:2px}"
+    },
+    {
+      "name": "Product Tile",
+      "kind": "card",
+      "description": "A square-cornered catalog item led by a large 4:5 image.",
+      "html": "<article class=\"ds-product\"><div class=\"ds-product-image\"></div><h3>The wall works harder</h3><p>STORAGE · SHELVES · HOOKS</p></article>",
+      "css": ".ds-product{max-width:320px;color:var(--ink,#18231c);font-family:Archivo,sans-serif}.ds-product-image{aspect-ratio:4/5;background:var(--green,#294536)}.ds-product h3{margin:14px 0 2px;font:500 22px/1.05 'Bodoni Moda',serif}.ds-product p{margin:0;color:#5d665e;font-size:11px;font-weight:700;letter-spacing:.04em}"
+    },
+    {
+      "name": "Editable Swatch",
+      "kind": "custom",
+      "description": "A full color field that explains a token's name and role.",
+      "html": "<label class=\"ds-swatch\"><strong>Ocean</strong><span>55% / MAIN BRAND FIELDS</span><input type=\"color\" value=\"#1f5661\"></label>",
+      "css": ".ds-swatch{display:flex;min-height:300px;padding:24px;flex-direction:column;justify-content:space-between;background:var(--blue,#1f5661);color:#fff}.ds-swatch strong{font:500 34px/1 'Bodoni Moda',serif}.ds-swatch span{font:700 11px/1.4 Archivo,sans-serif;letter-spacing:.04em}.ds-swatch input{width:34px;height:34px;border:1px solid currentColor;border-radius:50%;background:none}.ds-swatch:focus-within{outline:3px solid var(--gold,#e6b864);outline-offset:4px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Bath Cabinet",
+    "overview": "Bluvana makes small bathrooms easier to use and better to look at. Deep ocean color, dark tile, walnut and saturated vintage photography shape the brand.",
+    "keyCharacteristics": ["Muted architectural color", "Short benefit copy", "Saturated vintage photography", "Small bathroom proof", "Organic connected mark"],
+    "rules": [
+      { "name": "Architectural Field", "body": "Blue and green own full regions. Gold stays limited.", "section": "colors" },
+      { "name": "No Eyebrow", "body": "Headings stand on their own. Never add a small label above them.", "section": "typography" },
+      { "name": "Scan First", "body": "Lead with the benefit and cut everything a shopper does not need.", "section": "typography" },
+      { "name": "Protected Type", "body": "Display phrases use deliberate line breaks, scale with their container and remain clear of organic marks.", "section": "typography" },
+      { "name": "Logo Modes", "body": "Use light artwork on dark surfaces and dark artwork on light surfaces. Never alter the internal wave layers.", "section": "logo" },
+      { "name": "Physical Shadow", "body": "A shadow must describe an object sitting above a surface.", "section": "elevation" }
+    ],
+    "dos": ["Do let one or two palette colors own whole regions.", "Do show the product solving a space problem.", "Do preserve real material texture."],
+    "donts": ["Don't default to generic spa imagery.", "Don't add eyebrows above headings.", "Don't use long copy when one benefit line will do.", "Don't use em dashes or hyphens in customer facing copy."]
+  }
+}

@@ -1,0 +1,194 @@
+<script src="{{ 'silk-home.js' | asset_url }}" defer="defer"></script>
+
+{% liquid
+  assign shop_url = routes.all_products_collection_url
+  assign cat_names = section.settings.shop_names | split: '|'
+  assign cat_links = section.settings.shop_links | split: '|'
+  assign cat_assets = section.settings.shop_assets | split: '|'
+  assign co_names = section.settings.company_names | split: '|'
+  assign co_links = section.settings.company_links | split: '|'
+%}
+
+{%- capture logo_img -%}
+  {%- if section.settings.logo != blank -%}
+    <img src="{{ section.settings.logo | image_url: width: 620 }}" alt="{{ shop.name | escape }}" width="310" height="103">
+  {%- else -%}
+    <img src="{{ 'silk-wordmark.png' | asset_url }}" alt="{{ shop.name | escape }}" width="542" height="180">
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture icon_search -%}
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <circle cx="11" cy="11" r="7"></circle><path d="M20.5 20.5 16.6 16.6"></path>
+  </svg>
+{%- endcapture -%}
+
+{%- capture icon_bag -%}
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <path d="M5.5 8h13l1 11.5a1.5 1.5 0 0 1-1.5 1.6H6a1.5 1.5 0 0 1-1.5-1.6z"></path>
+    <path d="M8.8 8V6.2a3.2 3.2 0 0 1 6.4 0V8"></path>
+  </svg>
+{%- endcapture -%}
+
+<header class="sk-head" data-sk-head>
+  {%- comment -%} left: nav on desktop, hamburger on mobile {%- endcomment -%}
+  <div class="sk-head__l">
+    <button class="sk-burger" type="button" data-sk-open aria-label="Open menu" aria-expanded="false">
+      <span></span>
+    </button>
+
+    <nav class="sk-nav" aria-label="Primary">
+      <a class="sk-nav__link" href="{{ section.settings.feature_link | default: shop_url }}">
+        {{ section.settings.feature_label | default: 'Fall Collection' }}
+      </a>
+
+      <div class="sk-nav__item" data-sk-drop>
+        <button class="sk-nav__link sk-nav__btn" type="button" data-sk-trigger aria-expanded="false">
+          Shop
+          <svg class="sk-caret" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>
+        </button>
+
+        <div class="sk-mega" data-sk-panel>
+          <div class="sk-mega__in">
+            <ul class="sk-mega__cats">
+              {%- for n in cat_names -%}
+                {%- assign i = forloop.index0 -%}
+                {%- assign a = cat_assets[i] | strip -%}
+                <li>
+                  <a href="{{ cat_links[i] | default: shop_url }}">
+                    <span class="sk-mega__m">
+                      {%- if a != blank -%}
+                        <img src="{{ a | asset_url }}" alt="{{ n | strip }}" loading="lazy" width="160" height="160">
+                      {%- endif -%}
+                    </span>
+                    <span class="sk-mega__n">{{ n | strip }}</span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+
+            <div class="sk-mega__side">
+              <h4>Shop by color</h4>
+              <ul>
+                {%- assign colors = section.settings.color_names | default: 'Rouge|Ivory|Charcoal|Bone|Pine|Ink' | split: '|' -%}
+                {%- for c in colors -%}
+                  <li><a href="{{ shop_url }}">{{ c | strip }}</a></li>
+                {%- endfor -%}
+              </ul>
+              <a class="sk-mega__all" href="{{ shop_url }}">Shop everything</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sk-nav__item" data-sk-drop>
+        <button class="sk-nav__link sk-nav__btn" type="button" data-sk-trigger aria-expanded="false">
+          Company
+          <svg class="sk-caret" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>
+        </button>
+        <div class="sk-drop" data-sk-panel>
+          <ul>
+            {%- for n in co_names -%}
+              {%- assign i = forloop.index0 -%}
+              <li><a href="{{ co_links[i] | default: '#' }}">{{ n | strip }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  {%- comment -%} center: logo, on every breakpoint {%- endcomment -%}
+  <a class="sk-mark" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">{{ logo_img }}</a>
+
+  {%- comment -%} right: icons {%- endcomment -%}
+  <div class="sk-head__r">
+    <a class="sk-ico sk-ico--hide" href="{{ routes.search_url }}" aria-label="Search">{{ icon_search }}</a>
+    <a class="sk-ico" href="{{ routes.cart_url }}" aria-label="Bag, {{ cart.item_count }} items">
+      {{ icon_bag }}
+      {%- if cart.item_count > 0 -%}
+        <span class="sk-ico__n">{{ cart.item_count }}</span>
+      {%- endif -%}
+    </a>
+  </div>
+</header>
+
+<div class="sk-scrim" data-sk-scrim aria-hidden="true"></div>
+
+{%- comment -%} ---------- mobile drawer ---------- {%- endcomment -%}
+<div class="sk-drawer" data-sk-drawer aria-hidden="true">
+  <div class="sk-drawer__top">
+    <span class="sk-mark">{{ logo_img }}</span>
+    <button class="sk-drawer__close" type="button" data-sk-close aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <nav class="sk-drawer__nav" aria-label="Mobile">
+    <a class="sk-drawer__top-link" href="{{ section.settings.feature_link | default: shop_url }}">
+      {{ section.settings.feature_label | default: 'Fall Collection' }}
+    </a>
+
+    <button class="sk-acc" type="button" data-sk-acc aria-expanded="false">
+      Shop
+      <svg class="sk-caret" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>
+    </button>
+    <div class="sk-acc__body">
+      <ul class="sk-drawer__cats">
+        {%- for n in cat_names -%}
+          {%- assign i = forloop.index0 -%}
+          {%- assign a = cat_assets[i] | strip -%}
+          <li>
+            <a href="{{ cat_links[i] | default: shop_url }}">
+              <span class="sk-drawer__m">
+                {%- if a != blank -%}
+                  <img src="{{ a | asset_url }}" alt="{{ n | strip }}" loading="lazy" width="120" height="120">
+                {%- endif -%}
+              </span>
+              <span>{{ n | strip }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+      <a class="sk-drawer__all" href="{{ shop_url }}">Shop everything</a>
+    </div>
+
+    <button class="sk-acc" type="button" data-sk-acc aria-expanded="false">
+      Company
+      <svg class="sk-caret" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>
+    </button>
+    <div class="sk-acc__body">
+      <ul class="sk-drawer__plain">
+        {%- for n in co_names -%}
+          {%- assign i = forloop.index0 -%}
+          <li><a href="{{ co_links[i] | default: '#' }}">{{ n | strip }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    <a class="sk-drawer__util" href="{{ routes.search_url }}">{{ icon_search }} Search</a>
+  </nav>
+</div>
+
+{% schema %}
+{
+  "name": "Silk header",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo (falls back to silk-wordmark.png)" },
+
+    { "type": "header", "content": "Featured link" },
+    { "type": "text", "id": "feature_label", "label": "Label", "default": "Fall Collection" },
+    { "type": "url", "id": "feature_link", "label": "Link" },
+
+    { "type": "header", "content": "Shop mega menu" },
+    { "type": "textarea", "id": "shop_names", "label": "Category names (pipe separated)", "default": "Long Sleeve Sets|Short Sets|Slip Dresses|Robes|Lace Trim|Sets" },
+    { "type": "textarea", "id": "shop_links", "label": "Category links (pipe separated)" },
+    { "type": "textarea", "id": "shop_assets", "label": "Category image filenames (pipe separated)", "default": "silk-cat-1.png|silk-cat-2.png|silk-cat-3.png|silk-cat-4.png|silk-cat-5.png|silk-cat-6.png" },
+    { "type": "textarea", "id": "color_names", "label": "Colors (pipe separated)", "default": "Rouge|Ivory|Charcoal|Bone|Pine|Ink" },
+
+    { "type": "header", "content": "Company menu" },
+    { "type": "textarea", "id": "company_names", "label": "Links (pipe separated)", "default": "About|Contact us|Shipping|Returns" },
+    { "type": "textarea", "id": "company_links", "label": "URLs (pipe separated)" }
+  ]
+}
+{% endschema %}

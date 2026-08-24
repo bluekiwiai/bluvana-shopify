@@ -1,0 +1,13 @@
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "silk_footer": {
+      "type": "silk-footer",
+      "settings": {
+        "wordmark": "Bluvana"
+      }
+    }
+  },
+  "order": ["silk_footer"]
+}

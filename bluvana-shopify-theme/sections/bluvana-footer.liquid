@@ -1,0 +1,120 @@
+{% # Bluvana footer: brand + link columns with legal/policy placeholders %}
+<div class="bv-footer" role="contentinfo">
+  <div class="bv-footer-inner">
+    <div class="bv-footer-brand">
+      <img class="bv-footer-logo" src="{{ 'bluvana-wordmark-light.png' | asset_url }}" width="132" height="32" loading="lazy" alt="Bluvana">
+      <p class="bv-footer-tag">Better products for small bathrooms. Made for small bathrooms. Chosen for real routines.</p>
+    </div>
+
+    <nav class="bv-footer-col" aria-label="Shop">
+      <h3 class="bv-footer-head">Shop</h3>
+      <ul role="list">
+        <li><a href="/products/shower-filter">Shower Filter Pro</a></li>
+        <li><a href="/products/replacement-cartridges">Replacement Cartridges</a></li>
+        <li><a href="{{ routes.all_products_collection_url }}">Shop All</a></li>
+      </ul>
+    </nav>
+
+    <nav class="bv-footer-col" aria-label="Support">
+      <h3 class="bv-footer-head">Support</h3>
+      <ul role="list">
+        <li><a href="/pages/contact">Contact Us</a></li>
+        <li><a href="/pages/faq">FAQ</a></li>
+        <li><a href="/pages/track-order">Track Your Order</a></li>
+      </ul>
+    </nav>
+
+    <nav class="bv-footer-col" aria-label="Legal">
+      <h3 class="bv-footer-head">Legal &amp; Policies</h3>
+      <ul role="list">
+        <li><a href="/policies/refund-policy">Return &amp; Refund Policy</a></li>
+        <li><a href="/policies/shipping-policy">Shipping Policy</a></li>
+        <li><a href="/policies/privacy-policy">Privacy Policy</a></li>
+        <li><a href="/policies/terms-of-service">Terms of Service</a></li>
+        <li><a href="/pages/accessibility">Accessibility</a></li>
+        <li><a href="/pages/do-not-sell">Do Not Sell or Share My Info</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+{% stylesheet %}
+  .bv-footer {
+    background: var(--bv-ink, #0e0f10);
+    color: rgba(245, 242, 236, 0.72);
+    padding: clamp(48px, 6vw, 80px) clamp(20px, 4.5vw, 72px) clamp(32px, 4vw, 48px);
+    font-family: Archivo, Helvetica, sans-serif;
+  }
+
+  .bv-footer-inner {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    gap: clamp(28px, 4vw, 56px);
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+
+  .bv-footer-logo {
+    width: 132px;
+    height: auto;
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .bv-footer-tag {
+    max-width: 30ch;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgba(245, 242, 236, 0.55);
+  }
+
+  .bv-footer-head {
+    margin: 0 0 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e6b864;
+  }
+
+  .bv-footer-col ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bv-footer-col a {
+    font-size: 0.875rem;
+    color: rgba(245, 242, 236, 0.72);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .bv-footer-col a:hover {
+    color: #f5f2ec;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 749px) {
+    .bv-footer-inner {
+      grid-template-columns: 1fr 1fr;
+    }
+    .bv-footer-brand {
+      grid-column: 1 / -1;
+      margin-bottom: 8px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bluvana footer",
+  "tag": "section",
+  "settings": []
+}
+{% endschema %}

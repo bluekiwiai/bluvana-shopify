@@ -1,0 +1,19 @@
+Scope: Shopify homepage at `templates/index.json`. Visitor mode: Persuade.
+
+Audience and job: people furnishing, organizing, or improving a small bathroom. Help them recognize the offer in one line, see themselves in a believable routine, enter the catalog by space, and browse with confidence.
+
+Primary action: shop small bathroom picks. Secondary paths: shop by space (vanity, shower, walls, finishing touches), the small bathroom edit, newsletter.
+
+Proof and content: candid hyper-real lifestyle photography generated in one consistent room world (glazed deep green tile, walnut, travertine, aged brass, ocean blue waffle textiles); official Bluvana wordmark; dynamic Shopify products and collections when present. Do not invent commercial proof, reviews, prices, shipping, returns, or catalog counts.
+
+Chosen direction: The Bath Cabinet, storefront edition (user-pinned rebuild after the rejected Small-Space Plan). One native Horizon header on paper with the Bluvana wordmark and no announcement bar. The hero splits an Ocean Blue promise field (nowrap Bodoni display, gold blob, one gold action) from a candid vanity photograph carrying an ivory blob and a small Deep Tile stamp. Paper and ivory own the body; Ocean Blue returns for the routine editorial and the newsletter close. Green is never a background field; it appears only as the hero stamp and inside photography. Gold is reserved for actions, the organic mark, and hover details.
+
+Hard user constraints: no green header or green section backgrounds, no decorative CSS diagrams or floor plans, no duplicate headers, hero photograph always visible, display copy never wraps mid-line, plain human copy with no metaphors, imagery must read as real photography with people in the main shots.
+
+Memorable moment: the organic Bluvana mark drifting over the Ocean Blue fields and photography, with the photographic hero unveiling on load.
+
+Component grammar: flat architectural fields, square 4:5 editorial crops, hairline dividers, 9px control radius, film grain and a warm 1970s grade unifying all photography. Bodoni Moda display with Archivo body and utility. No eyebrows above headings. No em dashes in customer copy.
+
+Type ramp: hero display clamp 2.85rem to 6rem via container query units with nowrap deliberate breaks; section titles clamp 2.1rem to 4rem nowrap; item titles 1.15rem to 1.65rem; body 1rem to 1.125rem; utility 0.6875rem to 0.75rem uppercase.
+
+Constraints: landing page only; built on Horizon; single native header and footer; responsive to 320px; keyboard accessible; WCAG 2.2 AA; reduced motion safe; no live publish without explicit approval.

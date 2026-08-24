@@ -1,0 +1,38 @@
+{%- comment -%} Trust band. Same card language as the footer badges, on paper. {%- endcomment -%}
+{% liquid
+  assign items = section.settings.items | split: '§'
+%}
+
+{%- capture i1 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 7.5h10v9h-10z"/><path d="M12.5 11h4l3 3v2.5h-7z"/><circle cx="7" cy="18.5" r="2"/><circle cx="16.5" cy="18.5" r="2"/></svg>{%- endcapture -%}
+{%- capture i2 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 1 2.6 6.1"/><path d="M3.5 6.5v5h5"/></svg>{%- endcapture -%}
+{%- capture i3 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>{%- endcapture -%}
+{%- capture i4 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12.5a7.5 7.5 0 0 1-10.9 6.7L4 20.5l1.4-5.4A7.5 7.5 0 1 1 20.5 12.5z"/></svg>{%- endcapture -%}
+{%- assign icons = i1 | append: '||' | append: i2 | append: '||' | append: i3 | append: '||' | append: i4 | split: '||' -%}
+
+<section class="sk-tband" aria-label="Service">
+  <div class="sk-tband__in">
+    {%- for it in items -%}
+      {%- assign parts = it | split: '|' -%}
+      <div class="sk-tband__i">
+        <span class="sk-tband__ico">{{ icons[forloop.index0] }}</span>
+        <b>{{ parts[0] | strip }}</b>
+        <span>{{ parts[1] | strip }}</span>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Silk trust band",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "items",
+      "label": "Items (Title|Note, separated by §)",
+      "default": "Free shipping|On every order over $100§30 day returns|Unworn, in the original box§Secure checkout|Encrypted, never stored§Real people|We reply within a day"
+    }
+  ],
+  "presets": [{ "name": "Silk trust band" }]
+}
+{% endschema %}

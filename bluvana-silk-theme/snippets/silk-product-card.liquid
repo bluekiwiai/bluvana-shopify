@@ -1,0 +1,75 @@
+{%- comment -%}
+  Product card. Real product when a collection is wired up, otherwise a named
+  placeholder so the grid reads before the catalog is imported.
+  Params: product | ph_title, ph_price, ph_swatches
+{%- endcomment -%}
+
+{%- liquid
+  assign is_ph = true
+  if product != blank
+    assign is_ph = false
+  endif
+-%}
+
+<article class="sk-card">
+  <div class="sk-card__m">
+    {%- if is_ph -%}
+      {%- assign sw = ph_swatches | split: ',' -%}
+      {%- assign base = sw[0] | default: '#a81b34' -%}
+      {% render 'silk-shape', fill: base, tall: true %}
+      <span class="sk-flag sk-flag--fill sk-card__stock">In stock</span>
+    {%- else -%}
+      <a href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+        {%- if product.featured_media != blank -%}
+          <img src="{{ product.featured_media | image_url: width: 800 }}" alt="{{ product.featured_media.alt | escape }}" loading="lazy" width="420" height="525">
+        {%- endif -%}
+        {%- if product.media[1] != blank -%}
+          <img class="sk-card__img--hover" src="{{ product.media[1] | image_url: width: 800 }}" alt="" aria-hidden="true" loading="lazy" width="420" height="525">
+        {%- endif -%}
+      </a>
+      {%- if product.available -%}
+        <span class="sk-flag sk-flag--fill sk-card__stock">In stock</span>
+      {%- endif -%}
+    {%- endif -%}
+    <button class="sk-card__quick" type="button">Quick view</button>
+  </div>
+
+  <div class="sk-card__b">
+    <p class="sk-card__t">
+      {%- if is_ph -%}
+        {{ ph_title }}
+      {%- else -%}
+        <a href="{{ product.url }}">{{ product.title }}</a>
+      {%- endif -%}
+    </p>
+    <div class="sk-card__row">
+      <span class="sk-card__p">
+        {%- if is_ph -%}
+          {{ ph_price }}
+        {%- else -%}
+          {{ product.price | money }}
+          {%- if product.compare_at_price > product.price -%}
+            <s class="sk-card__was">{{ product.compare_at_price | money }}</s>
+          {%- endif -%}
+        {%- endif -%}
+      </span>
+      <span class="sk-card__sw">
+        {%- if is_ph -%}
+          {%- assign sw2 = ph_swatches | split: ',' -%}
+          {%- for c in sw2 -%}
+            <i style="background:{{ c | strip }}"></i>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for opt in product.options_with_values -%}
+            {%- assign oname = opt.name | downcase -%}
+            {%- if oname contains 'color' or oname contains 'colour' -%}
+              {%- for v in opt.values limit: 5 -%}
+                <i style="background:{{ v | handle }}"></i>
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </span>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,45 @@
+{
+  "title": "Bluvana Silk Pajama Set",
+  "descriptionHtml": "<p>A softly tailored pajama set with a fluid, silk-like drape.</p>",
+  "vendor": "Bluvana",
+  "productType": "Pajamas",
+  "tags": ["sleepwear", "silk", "women"],
+  "status": "DRAFT",
+  "publish": false,
+  "images": [
+    {
+      "src": "../../product-images/bluvana-pajama-front.jpg",
+      "alt": "Bluvana silk pajama set, front view"
+    },
+    {
+      "src": "https://cdn.example.com/bluvana-pajama-back.jpg",
+      "alt": "Bluvana silk pajama set, back view"
+    }
+  ],
+  "options": [
+    { "name": "Color", "values": ["Midnight", "Champagne"] },
+    { "name": "Size", "values": ["XS", "S", "M", "L", "XL"] }
+  ],
+  "variants": [
+    {
+      "options": { "Color": "Midnight", "Size": "XS" },
+      "price": "89.00",
+      "compareAtPrice": "119.00",
+      "sku": "BLU-PJ-MID-XS",
+      "inventory": 20,
+      "tracked": true,
+      "requiresShipping": true,
+      "imageIndex": 0
+    },
+    {
+      "options": { "Color": "Champagne", "Size": "XS" },
+      "price": "89.00",
+      "compareAtPrice": "119.00",
+      "sku": "BLU-PJ-CHA-XS",
+      "inventory": 20,
+      "tracked": true,
+      "requiresShipping": true,
+      "imageIndex": 1
+    }
+  ]
+}

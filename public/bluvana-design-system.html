@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The editable visual and photography system for Bluvana.">
+  <title>Bluvana Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1f5661;
+      --green: #294536;
+      --gold: #e6b864;
+      --ivory: #f5f0e5;
+      --paper: #fcfaf5;
+      --ink: #18231c;
+      --muted: #5d665e;
+      --line: rgba(24, 35, 28, .22);
+      --display: "Bodoni Moda", Georgia, serif;
+      --body: "Archivo", Helvetica, sans-serif;
+      --ease: cubic-bezier(.16, 1, .3, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.55;
+      text-rendering: optimizeLegibility;
+    }
+    img { display: block; max-width: 100%; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    ::selection { background: var(--gold); color: var(--ink); }
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+
+    .shell { display: grid; grid-template-columns: 255px minmax(0, 1fr); min-height: 100vh; }
+    .rail {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 28px 24px;
+      color: var(--ivory);
+      background: var(--green);
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+    }
+    .brand-logo { display: block; width: 100%; height: auto; object-fit: contain; }
+    .rail-logo { width: 168px; }
+    .rail-note { margin: 12px 0 32px; max-width: 18ch; color: #e9eadc; font-size: 12px; line-height: 1.45; }
+    .nav { display: grid; gap: 2px; }
+    .nav a {
+      padding: 9px 10px;
+      border-radius: 8px;
+      color: #e9eadc;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-decoration: none;
+      transition: background .25s var(--ease), color .25s var(--ease);
+    }
+    .nav a:hover, .nav a.active { color: var(--ink); background: var(--gold); }
+    .rail-actions { display: grid; gap: 8px; margin-top: auto; }
+    .small-button {
+      min-height: 42px;
+      border: 1px solid rgba(245, 240, 229, .48);
+      border-radius: 9px;
+      background: transparent;
+      color: var(--ivory);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .small-button:hover { background: rgba(245, 240, 229, .12); }
+    .small-button.primary { border-color: var(--gold); background: var(--gold); color: var(--ink); }
+
+    main { min-width: 0; overflow: hidden; }
+    .hero {
+      min-height: 92vh;
+      background: var(--blue);
+      color: var(--ivory);
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(420px, 1.08fr);
+    }
+    .hero-copy { position: relative; container-type: inline-size; padding: clamp(42px, 6vw, 92px); display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+    .hero-copy p { max-width: 48ch; color: #e3e9f2; }
+    .hero h1 {
+      margin: 32px 0;
+      max-width: 8ch;
+      font-family: var(--display);
+      position: relative;
+      z-index: 3;
+      margin-top: clamp(116px, 30cqi, 172px);
+      font-size: clamp(46px, 17cqi, 96px);
+      font-weight: 500;
+      letter-spacing: -.04em;
+      line-height: .82;
+      white-space: nowrap;
+    }
+    .hero h1 span { display: block; color: var(--gold); font-style: italic; }
+    .hero-visual { position: relative; min-height: 720px; background: var(--ivory); overflow: hidden; }
+    .hero-visual img { width: 100%; height: 100%; object-fit: cover; filter: sepia(.12) saturate(1.16) contrast(1.12) brightness(.94); }
+    .hero-stamp {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: min(48%, 280px);
+      aspect-ratio: 1;
+      padding: 28px;
+      background: var(--green);
+      display: flex;
+      align-items: flex-end;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .organic-mark { position: absolute; z-index: 2; pointer-events: none; }
+    .organic-mark use { fill: currentColor; }
+    .hero-mark { right: clamp(12px, 4cqi, 36px); top: clamp(24px, 6cqi, 52px); width: clamp(120px, 34cqi, 210px); color: var(--gold); transform: rotate(-8deg); opacity: .96; }
+    .visual-mark { left: 7%; bottom: 8%; width: 250px; color: var(--ivory); mix-blend-mode: screen; opacity: .88; }
+    .photo-mark { right: -62px; top: 18px; width: min(42%, 280px); color: var(--gold); transform: rotate(12deg); }
+
+    .section { padding: clamp(72px, 9vw, 140px) clamp(28px, 7vw, 108px); border-bottom: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 420px); gap: 48px; align-items: end; margin-bottom: 72px; }
+    .section h2 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(36px, 6vw, 96px);
+      font-weight: 500;
+      line-height: .95;
+      letter-spacing: -.035em;
+      white-space: nowrap;
+    }
+    .section-intro { max-width: 62ch; margin: 0; color: var(--muted); }
+    .editable { border-radius: 4px; }
+    .editable:hover { box-shadow: inset 0 -1px currentColor; }
+    .editable:focus { outline: 3px solid var(--gold); outline-offset: 4px; }
+    .edit-hint { font-size: 11px; color: var(--muted); }
+
+    .manifesto { position: relative; background: var(--ivory); }
+    .manifesto-grid { display: grid; grid-template-columns: .82fr 1.18fr; gap: clamp(50px, 8vw, 120px); }
+    .big-statement { margin: 0; font-family: var(--display); font-size: clamp(34px, 4.5vw, 70px); line-height: 1.06; letter-spacing: -.025em; }
+    .principles { margin: 0; padding: 0; border-top: 1px solid var(--ink); list-style: none; }
+    .principles li { padding: 20px 0; border-bottom: 1px solid var(--line); }
+    .principles b { display: block; margin-bottom: 4px; }
+    .principles p { margin: 0; color: var(--muted); }
+
+    .palette { background: var(--paper); }
+    .swatches { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 500px; }
+    .swatch { position: relative; min-height: 420px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; color: white; }
+    .swatch:nth-child(1) { background: var(--blue); }
+    .swatch:nth-child(2) { background: var(--green); }
+    .swatch:nth-child(3) { background: var(--gold); color: var(--ink); }
+    .swatch-name { font-family: var(--display); font-size: 34px; line-height: 1; }
+    .swatch-role { max-width: 22ch; font-size: 12px; }
+    .swatch-control { display: flex; align-items: center; gap: 10px; }
+    .swatch input[type="color"] { width: 34px; height: 34px; padding: 0; border: 1px solid currentColor; border-radius: 50%; background: none; cursor: pointer; overflow: hidden; }
+    .swatch input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .swatch input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+    .hex { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .usage-strip { display: grid; grid-template-columns: 55% 30% 15%; height: 18px; margin-top: 20px; }
+    .usage-strip span:nth-child(1) { background: var(--blue); }
+    .usage-strip span:nth-child(2) { background: var(--green); }
+    .usage-strip span:nth-child(3) { background: var(--gold); }
+    .palette-note { display: flex; justify-content: space-between; gap: 30px; margin-top: 16px; color: var(--muted); font-size: 12px; }
+
+    .logos { background: var(--paper); }
+    .logo-showcase { display: grid; grid-template-columns: 1fr 1fr; min-height: 620px; }
+    .logo-panel { padding: clamp(32px, 5vw, 72px); display: flex; flex-direction: column; justify-content: center; gap: 48px; overflow: hidden; }
+    .logo-panel.dark { background: var(--green); color: var(--ivory); }
+    .logo-panel.light { background: var(--ivory); color: var(--ink); }
+    .logo-pair { display: flex; align-items: center; gap: clamp(28px, 5vw, 70px); }
+    .logo-pair .logo-wordmark { width: min(78%, 540px); }
+    .logo-pair .logo-monogram { width: clamp(62px, 12%, 96px); }
+    .logo-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .logo-actions span { margin-right: auto; font-size: 12px; font-weight: 700; }
+    .logo-actions a { min-height: 42px; padding: 0 14px; border: 1px solid currentColor; border-radius: 9px; display: inline-flex; align-items: center; color: inherit; font-size: 11px; font-weight: 700; text-decoration: none; }
+
+    .type { background: var(--green); color: var(--ivory); }
+    .type .section-intro { color: #dde6d9; }
+    .type-specimen { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(245, 240, 229, .4); }
+    .type-specimen > div { min-height: 360px; padding: 44px 0; }
+    .type-specimen > div + div { padding-left: 44px; border-left: 1px solid rgba(245, 240, 229, .4); }
+    .display-sample { margin: 28px 0 0; font-family: var(--display); font-size: clamp(54px, 7vw, 104px); line-height: .9; letter-spacing: -.035em; }
+    .body-sample { max-width: 54ch; margin: 28px 0 0; font-size: 20px; line-height: 1.5; }
+    .scale-row { display: grid; grid-template-columns: 90px 1fr; gap: 24px; align-items: baseline; padding: 17px 0; border-bottom: 1px solid rgba(245, 240, 229, .2); }
+    .scale-row span:first-child { font-size: 11px; opacity: .72; }
+
+    .photography { background: var(--ivory); }
+    .photo-thesis { position: relative; display: grid; grid-template-columns: 1.2fr .8fr; min-height: 680px; background: var(--blue); color: white; overflow: hidden; }
+    .photo-image { position: relative; min-width: 0; overflow: hidden; }
+    .photo-image img { width: 100%; height: 100%; object-fit: cover; filter: sepia(.12) saturate(1.16) contrast(1.12) brightness(.94); }
+    .photo-thesis-copy { padding: clamp(40px, 6vw, 82px); display: flex; flex-direction: column; justify-content: space-between; }
+    .photo-thesis blockquote { margin: 0; font-family: var(--display); font-size: clamp(38px, 5vw, 68px); line-height: 1; letter-spacing: -.03em; }
+    .photo-thesis p { max-width: 42ch; color: #e5eaf2; }
+    .shot-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-top: 80px; }
+    .shot { position: relative; overflow: hidden; background: #ddd; min-height: 420px; }
+    .shot:nth-child(1) { grid-column: span 7; }
+    .shot:nth-child(2) { grid-column: span 5; }
+    .shot:nth-child(3), .shot:nth-child(4), .shot:nth-child(5) { grid-column: span 4; }
+    .shot img { width: 100%; height: 100%; object-fit: cover; filter: sepia(.12) saturate(1.16) contrast(1.12) brightness(.94); transition: filter .5s var(--ease), transform .8s var(--ease); }
+    .shot:hover img { transform: scale(1.025); }
+    .shot-label { position: absolute; left: 0; bottom: 0; max-width: 82%; padding: 14px 18px; background: var(--paper); font-size: 12px; font-weight: 700; }
+
+    .shot-system { margin-top: 90px; }
+    .shot-row { display: grid; grid-template-columns: 100px 1fr 1fr; gap: 28px; padding: 26px 0; border-top: 1px solid var(--line); }
+    .shot-row:last-child { border-bottom: 1px solid var(--line); }
+    .shot-code { font-family: var(--display); font-size: 30px; color: var(--blue); }
+    .shot-row h3 { margin: 0 0 8px; font-size: 18px; }
+    .shot-row p { margin: 0; color: var(--muted); max-width: 52ch; }
+
+    .product { background: var(--gold); }
+    .product-board { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+    .product-stage { position: relative; min-height: 650px; background: var(--ivory); overflow: hidden; }
+    .tile-wall { position: absolute; inset: 0 0 42% 0; background-color: var(--green); background-image: linear-gradient(rgba(245,240,229,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,229,.35) 1px, transparent 1px); background-size: 70px 70px; }
+    .stone-shelf { position: absolute; left: 0; right: 0; bottom: 0; height: 44%; background: #d7cfbc; }
+    .product-silhouette { position: absolute; left: 50%; top: 48%; width: 31%; height: 42%; transform: translate(-50%, -50%); border-radius: 44% 44% 20% 20% / 28% 28% 14% 14%; background: var(--blue); box-shadow: 20px 28px 34px rgba(24,35,28,.22); }
+    .product-silhouette::before { content: ""; position: absolute; left: 22%; right: 22%; top: -9%; height: 12%; border-radius: 8px 8px 0 0; background: var(--ink); }
+    .product-silhouette::after { content: "Bluvana"; position: absolute; left: 0; right: 0; top: 48%; text-align: center; color: white; font-family: var(--display); font-size: clamp(18px, 2vw, 30px); }
+    .stage-note { position: absolute; left: 24px; bottom: 22px; z-index: 2; max-width: 30ch; font-size: 11px; font-weight: 700; }
+    .product-rules { display: grid; grid-template-rows: repeat(3, 1fr); gap: 16px; }
+    .rule-block { padding: 30px; background: var(--paper); display: flex; flex-direction: column; justify-content: space-between; }
+    .rule-block h3 { margin: 0 0 20px; font-family: var(--display); font-size: 30px; font-weight: 500; }
+    .rule-block p { margin: 0; color: var(--muted); }
+    .rule-block b { color: var(--ink); }
+
+    .application { background: var(--paper); }
+    .ui-sample { display: grid; grid-template-columns: .74fr 1.26fr; border: 1px solid var(--line); min-height: 620px; }
+    .ui-panel { position: relative; padding: 38px; background: var(--green); color: var(--ivory); display: flex; flex-direction: column; overflow: hidden; }
+    .ui-panel .panel-logo { width: min(72%, 220px); }
+    .ui-panel h3 { margin: auto 0 24px; font-family: var(--display); font-size: clamp(34px, 4vw, 50px); font-weight: 500; line-height: 1; }
+    .ui-panel p { color: #e2eadf; }
+    .ui-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 0 20px; border: 0; border-radius: 9px; background: var(--gold); color: var(--ink); font-weight: 700; cursor: pointer; }
+    .ui-button svg { width: 18px; }
+    .ui-catalog { padding: 38px; display: grid; grid-template-rows: auto 1fr; gap: 36px; }
+    .catalog-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .catalog-head p { margin: 0; font-size: 12px; font-weight: 700; }
+    .catalog-products { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .catalog-item { min-width: 0; }
+    .catalog-image { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #d9d6cc; }
+    .catalog-image img { width: 100%; height: 100%; object-fit: cover; filter: sepia(.12) saturate(1.16) contrast(1.12) brightness(.94); }
+    .catalog-item h4 { margin: 14px 0 2px; font-family: var(--display); font-size: 22px; font-weight: 500; }
+    .catalog-item p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .dos { background: var(--blue); color: white; }
+    .dos .section-intro { color: #dce5f2; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,.35); }
+    .compare > div { padding: clamp(30px, 5vw, 64px); background: var(--blue); }
+    .compare h3 { margin: 0 0 32px; font-family: var(--display); font-size: 42px; font-weight: 500; }
+    .compare ul { margin: 0; padding: 0; list-style: none; }
+    .compare li { position: relative; padding: 16px 0 16px 34px; border-top: 1px solid rgba(255,255,255,.24); }
+    .compare li::before { position: absolute; left: 0; top: 16px; font-weight: 700; }
+    .do li::before { content: "DO"; color: var(--gold); font-size: 9px; letter-spacing: .08em; }
+    .dont li::before { content: "AVOID"; color: #d6c9a9; font-size: 9px; letter-spacing: .08em; }
+
+    .reference { background: var(--ink); color: var(--ivory); }
+    .reference .section-intro { color: #cdd4ce; }
+    .reference-grid { columns: 4 220px; column-gap: 12px; }
+    .reference-grid figure { break-inside: avoid; margin: 0 0 12px; position: relative; overflow: hidden; }
+    .reference-grid img { width: 100%; filter: sepia(.12) saturate(1.16) contrast(1.12) brightness(.94); transition: filter .35s var(--ease); }
+    .reference-grid figure:hover img { filter: sepia(.08) saturate(1.24) contrast(1.14) brightness(.96); }
+    .reference-grid figcaption { position: absolute; left: 10px; right: 10px; bottom: 10px; padding: 8px 10px; background: rgba(24,35,28,.82); font-size: 10px; }
+
+    footer { padding: 42px clamp(28px, 7vw, 108px); background: var(--green); color: white; display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; }
+    footer .footer-logo { width: min(44vw, 560px); }
+    footer p { max-width: 34ch; margin: 0; font-size: 12px; }
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 50; padding: 14px 18px; border-radius: 10px; background: var(--ink); color: white; box-shadow: 0 18px 40px rgba(24,35,28,.24); font-size: 12px; font-weight: 700; transform: translateY(150%); transition: transform .4s var(--ease); }
+    .toast.show { transform: translateY(0); }
+
+    @media (max-width: 980px) {
+      .shell { display: block; }
+      .rail { height: auto; padding: 16px 20px; flex-direction: row; align-items: center; gap: 20px; }
+      .rail-note, .rail-actions { display: none; }
+      .nav { display: flex; overflow-x: auto; margin-left: auto; }
+      .nav a { white-space: nowrap; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-visual { min-height: 62vh; }
+      .section-head, .manifesto-grid, .photo-thesis, .product-board, .ui-sample, .logo-showcase { grid-template-columns: 1fr; }
+      .swatches { grid-template-columns: 1fr 1fr; }
+      .shot:nth-child(n) { grid-column: span 6; }
+      .shot:nth-child(1) { grid-column: span 12; }
+      .shot-row { grid-template-columns: 70px 1fr; }
+      .shot-row > :last-child { grid-column: 2; }
+      .product-stage { min-height: 560px; }
+    }
+    @media (max-width: 660px) {
+      .rail { align-items: flex-start; }
+      .rail-logo { width: 108px; margin-top: 8px; }
+      .nav { max-width: calc(100vw - 125px); }
+      .hero-copy { min-height: 560px; padding: 48px 28px; }
+      .hero h1 { margin-top: clamp(106px, 30cqi, 136px); font-size: clamp(42px, 16.5cqi, 68px); }
+      .hero-visual { min-height: 520px; }
+      .section { padding: 72px 24px; }
+      .section-head { gap: 26px; margin-bottom: 48px; }
+      .section h2 { font-size: clamp(34px, 10vw, 48px); }
+      .swatches { grid-template-columns: 1fr; }
+      .swatch { min-height: 300px; }
+      .type-specimen, .compare, .catalog-products { grid-template-columns: 1fr; }
+      .type-specimen > div + div { padding-left: 0; border-left: 0; border-top: 1px solid rgba(245,240,229,.4); }
+      .photo-thesis { min-height: 0; }
+      .photo-image { height: 480px; }
+      .shot-grid { display: block; }
+      .shot { min-height: 480px; margin-bottom: 14px; }
+      .shot-row { grid-template-columns: 52px 1fr; gap: 16px; }
+      .product-stage { min-height: 500px; }
+      .ui-catalog, .ui-panel { padding: 28px; }
+      .reference-grid { columns: 2 150px; }
+      footer { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+    @media print {
+      .rail, .toast { display: none; }
+      .shell { display: block; }
+      .section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <symbol id="bluvana-mark" viewBox="0 0 320 170">
+      <path d="M18 105C18 74 43 51 70 57C92 63 84 91 82 111C80 129 90 138 101 132C118 122 114 79 120 48C126 14 159 13 171 40C184 68 161 101 176 115C187 125 201 111 211 91C225 63 252 55 273 74C293 92 291 123 274 142C251 167 218 159 204 141C191 159 169 168 149 154C133 144 126 125 128 103C115 140 96 158 72 157C40 156 18 138 18 105Z"/>
+    </symbol>
+  </svg>
+  <!--
+    THESIS: Bluvana makes small bathrooms feel better through useful products and expressive color.
+    OWN-WORLD: Deep ocean blue, dark tile green and sun gold meet glazed grids, walnut warmth and saturated vintage color.
+    STORY: Scan the rules, adjust the colors and apply one clear image system across the catalog.
+    FIRST VIEWPORT: Large Bluvana type shares the screen with a tiled bathroom, a dark green note and the organic brand mark.
+    FORM: The Bath Cabinet, third grounded direction; seed 7b1b9614.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+  -->
+  <div class="shell">
+    <aside class="rail" aria-label="Design system navigation">
+      <a href="#top" aria-label="Bluvana home"><img class="brand-logo rail-logo" src="./bluvana-logos/bluvana-wordmark-on-dark-cropped.png" alt="Bluvana"></a>
+      <p class="rail-note">A living field guide for beautiful bathrooms that make more of less.</p>
+      <nav class="nav">
+        <a href="#core">Brand core</a>
+        <a href="#logo">Logo</a>
+        <a href="#color">Color</a>
+        <a href="#type">Typography</a>
+        <a href="#photography">Photography</a>
+        <a href="#product">Product images</a>
+        <a href="#application">In application</a>
+        <a href="#references">References</a>
+      </nav>
+      <div class="rail-actions">
+        <button class="small-button primary" id="copyTokens">Copy CSS tokens</button>
+        <button class="small-button" id="downloadTokens">Download JSON</button>
+        <button class="small-button" id="resetColors">Reset colors</button>
+      </div>
+    </aside>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <svg class="organic-mark hero-mark" viewBox="0 0 320 170" aria-hidden="true"><use href="#bluvana-mark"/></svg>
+          <h1 id="hero-title" class="editable" contenteditable="true" spellcheck="false">Small room, <span>better life.</span></h1>
+          <div>
+            <p class="editable" contenteditable="true">Bathroom products that save space and make the room feel like yours.</p>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="./bluvana-references/aca6a89a8e47d67c8ef8b00e4addc082.jpg" alt="Bathroom with deep green tile, walnut vanity and black fixtures">
+          <svg class="organic-mark visual-mark" viewBox="0 0 320 170" aria-hidden="true"><use href="#bluvana-mark"/></svg>
+          <div class="hero-stamp">More beauty.<br>Less clutter.</div>
+        </div>
+      </section>
+
+      <section class="section manifesto" id="core">
+        <header class="section-head">
+          <h2>Small room.<br>Full life.</h2>
+          <p class="section-intro">Useful products. Rich color. A bathroom that feels put together.</p>
+        </header>
+        <div class="manifesto-grid">
+          <p class="big-statement editable" contenteditable="true">Small bathrooms can still feel beautiful, calm and easy to use.</p>
+          <ol class="principles">
+            <li><b>Earn the space.</b><p>Every product solves a problem and improves the room.</p></li>
+            <li><b>Show real bathrooms.</b><p>Keep corners, counters and tight spaces in frame.</p></li>
+            <li><b>Sell the outcome.</b><p>Lead with more room, less mess, better water or easier mornings.</p></li>
+            <li><b>Keep it warm.</b><p>Use tile, wood, water, skin and textured fabric.</p></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section logos" id="logo">
+        <header class="section-head">
+          <h2>One mark.<br>Two modes.</h2>
+          <p class="section-intro">Use the light artwork on dark surfaces and the dark artwork on light surfaces.</p>
+        </header>
+        <div class="logo-showcase">
+          <div class="logo-panel dark">
+            <div class="logo-pair">
+              <img class="brand-logo logo-wordmark" src="./bluvana-logos/bluvana-wordmark-on-dark-cropped.png" alt="Bluvana wordmark for dark backgrounds">
+              <img class="brand-logo logo-monogram" src="./bluvana-logos/bluvana-monogram-on-dark-cropped.png" alt="Bluvana monogram for dark backgrounds">
+            </div>
+            <div class="logo-actions">
+              <span>For dark surfaces</span>
+              <a href="./bluvana-logos/bluvana-wordmark-on-dark-cropped.png" download>Wordmark PNG</a>
+              <a href="./bluvana-logos/bluvana-monogram-on-dark-cropped.png" download>Monogram PNG</a>
+            </div>
+          </div>
+          <div class="logo-panel light">
+            <div class="logo-pair">
+              <img class="brand-logo logo-wordmark" src="./bluvana-logos/bluvana-wordmark-on-light-cropped.png" alt="Bluvana wordmark for light backgrounds">
+              <img class="brand-logo logo-monogram" src="./bluvana-logos/bluvana-monogram-on-light-cropped.png" alt="Bluvana monogram for light backgrounds">
+            </div>
+            <div class="logo-actions">
+              <span>For light surfaces</span>
+              <a href="./bluvana-logos/bluvana-wordmark-on-light-cropped.png" download>Wordmark PNG</a>
+              <a href="./bluvana-logos/bluvana-monogram-on-light-cropped.png" download>Monogram PNG</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section palette" id="color">
+        <header class="section-head">
+          <h2>Color with<br>depth.</h2>
+          <p class="section-intro">Three muted colors inspired by ocean water, dark tile and late afternoon sun.</p>
+        </header>
+        <div class="swatches" aria-label="Editable brand colors">
+          <article class="swatch"><span class="swatch-name">Ocean</span><span class="swatch-role">55% / main brand fields and packaging</span><label class="swatch-control"><input type="color" data-token="blue" value="#1f5661" aria-label="Edit Ocean blue"><span class="hex">#1F5661</span></label></article>
+          <article class="swatch"><span class="swatch-name">Deep Tile</span><span class="swatch-role">30% / navigation and room context</span><label class="swatch-control"><input type="color" data-token="green" value="#294536" aria-label="Edit Deep Tile green"><span class="hex">#294536</span></label></article>
+          <article class="swatch"><span class="swatch-name">Sun</span><span class="swatch-role">15% / actions and small details</span><label class="swatch-control"><input type="color" data-token="gold" value="#e6b864" aria-label="Edit Sun gold"><span class="hex">#E6B864</span></label></article>
+        </div>
+        <div class="usage-strip" aria-label="Recommended color ratio"><span></span><span></span><span></span></div>
+        <div class="palette-note"><span>Recommended ratio: 55 / 30 / 15</span><span>Mineral Ivory #F5F0E5 · Ink #18231C</span></div>
+      </section>
+
+      <section class="section type" id="type">
+        <header class="section-head">
+          <h2>Beautiful words.<br>Fewer of them.</h2>
+          <p class="section-intro">Bodoni Moda leads. Archivo makes every product easy to scan.</p>
+        </header>
+        <div class="type-specimen">
+          <div><p class="display-sample editable" contenteditable="true">Make room for beautiful.</p></div>
+          <div><p class="body-sample editable" contenteditable="true">More room. Less mess. A bathroom that works better every day.</p></div>
+        </div>
+        <div class="scale-row"><span>Display XL</span><b style="font:500 clamp(48px,6vw,84px)/.95 var(--display)">A better bathroom</b></div>
+        <div class="scale-row"><span>Heading</span><b style="font:500 36px/1.05 var(--display)">Thoughtful by design</b></div>
+        <div class="scale-row"><span>Body</span><span style="font-size:16px">Lead with the benefit. Keep it short.</span></div>
+        <div class="scale-row"><span>Utility</span><span style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Dimensions · materials · care</span></div>
+      </section>
+
+      <section class="section photography" id="photography">
+        <header class="section-head">
+          <h2>Photography<br>you can feel.</h2>
+          <p class="section-intro">Warm, saturated color with the contrast and grain of a 1970s photograph.</p>
+        </header>
+        <div class="photo-thesis">
+          <div class="photo-image">
+            <img src="./bluvana-references/c3f348ecd837b23a41619af0b6b54d0a.jpg" alt="Person brushing their teeth in a small blue tiled bathroom">
+            <svg class="organic-mark photo-mark" viewBox="0 0 320 170" aria-hidden="true"><use href="#bluvana-mark"/></svg>
+          </div>
+          <div class="photo-thesis-copy"><blockquote>Frame the gesture, not the pose.</blockquote><p>Let mirrors double the room. Let towels, water, grout, steam and skin carry texture. Keep the grain. Keep the warmth.</p></div>
+        </div>
+        <div class="shot-grid">
+          <figure class="shot"><img src="./bluvana-references/20e1624198d026904a6e0cdb8550439a.jpg" alt="Person sitting in a mint tiled bathtub"><figcaption class="shot-label">Human scale / close and unposed</figcaption></figure>
+          <figure class="shot"><img src="./bluvana-references/83038e5b783117d61ef57bbbe018045b.jpg" alt="Person doing makeup at a marble bathroom vanity"><figcaption class="shot-label">Material contrast / marble, skin, towel, chrome</figcaption></figure>
+          <figure class="shot"><img src="./bluvana-references/f49b2f62eccb9605eb95293577859721.jpg" alt="Person drying hair with a pink towel"><figcaption class="shot-label">Natural motion / already in use</figcaption></figure>
+          <figure class="shot"><img src="./bluvana-references/93a33860e7ffc3681166776aa2f5ce94.jpg" alt="Person in a tiled bathroom with coral towel and green hair wrap"><figcaption class="shot-label">Color echo / product, textile, tile</figcaption></figure>
+          <figure class="shot"><img src="./bluvana-references/483a3796571b1902919419b1b96b0d3c.jpg" alt="Person wearing a turquoise towel in a small tiled bathroom"><figcaption class="shot-label">Space proof / edges stay in frame</figcaption></figure>
+        </div>
+
+        <div class="shot-system">
+          <div class="shot-row"><span class="shot-code">55%</span><div><h3>Product hero</h3><p>One clear 4:5 image. The product fills 60 to 75% of the frame.</p></div><p>Place it on tile, stone or wood. Keep the finish accurate.</p></div>
+          <div class="shot-row"><span class="shot-code">20%</span><div><h3>In use</h3><p>Show hands, water and the product doing its job.</p></div><p>Make the customer feel inside the room.</p></div>
+          <div class="shot-row"><span class="shot-code">15%</span><div><h3>Space gained</h3><p>Show the shelf, corner or counter space the product saves.</p></div><p>Keep nearby objects visible so scale is clear.</p></div>
+          <div class="shot-row"><span class="shot-code">10%</span><div><h3>Material detail</h3><p>Show water, metal, cotton, ceramic and wood up close.</p></div><p>Texture makes simple products feel worth touching.</p></div>
+        </div>
+      </section>
+
+      <section class="section product" id="product">
+        <header class="section-head">
+          <h2>One catalog.<br>Many objects.</h2>
+          <p class="section-intro" style="color:#4b3a1f">Every product gets the same priority: centered, easy to see and placed in a bathroom.</p>
+        </header>
+        <div class="product-board">
+          <div class="product-stage" aria-label="Illustrative product image composition">
+            <div class="tile-wall"></div><div class="stone-shelf"></div><div class="product-silhouette"></div>
+            <span class="stage-note">Composition model: one product, one architectural surface, one directional shadow. Synthetic placeholder shown.</span>
+          </div>
+          <div class="product-rules">
+            <article class="rule-block"><h3>Product hero / 4:5</h3><p>Center the object. Use a 35 to 70mm lens. Show the full shape.</p></article>
+            <article class="rule-block"><h3>Brand image / 3:4 or 16:9</h3><p>Place the object in a room. Use one palette color and one clear benefit.</p></article>
+            <article class="rule-block"><h3>Shop image / 1:1</h3><p>Keep the background. Remove extra props. Make comparison easy.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section application" id="application">
+        <header class="section-head">
+          <h2>The system<br>at work.</h2>
+          <p class="section-intro">Large images sell the product. Short copy sells the benefit.</p>
+        </header>
+        <div class="ui-sample">
+          <div class="ui-panel"><img class="brand-logo panel-logo" src="./bluvana-logos/bluvana-wordmark-on-dark-cropped.png" alt="Bluvana"><h3>A little more room to breathe.</h3><p>Smart products for small bathrooms.</p><button class="ui-button">Shop small bathroom picks <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="ui-catalog"><div class="catalog-head"><p>Small bathroom edit / 24 objects</p><p>Filter +</p></div><div class="catalog-products"><article class="catalog-item"><div class="catalog-image"><img src="./bluvana-references/aca6a89a8e47d67c8ef8b00e4addc082.jpg" alt="Green tiled bathroom with wood vanity"></div><h4>Clear the counter</h4><p>Storage · shelves · hooks</p></article><article class="catalog-item"><div class="catalog-image"><img src="./bluvana-references/f74be32cac042f61979d89d31733ea6c.jpg" alt="Person leaning over a white bathtub with towel wrapped around hair"></div><h4>Make showers feel better</h4><p>Water · towels · care</p></article></div></div>
+        </div>
+      </section>
+
+      <section class="section dos" id="dos">
+        <header class="section-head"><h2>Keep it<br>Bluvana.</h2><p class="section-intro">If it looks clinical, generic or staged, change it.</p></header>
+        <div class="compare"><div class="do"><h3>Do</h3><ul><li>Show the product solving a space problem</li><li>Use daylight or direct flash</li><li>Show tile, wood, stone, water and fabric</li><li>Cast different ages, bodies and personal styles</li><li>Keep one brand color in the room</li><li>Keep grain, shadow and reflection</li></ul></div><div class="dont"><h3>Avoid</h3><ul><li>Generic white marble spa images</li><li>Props that hide the product</li><li>Blue splashes and science graphics</li><li>Plastic skin or surfaces</li><li>Only showing large bathrooms</li><li>Color edits that change the product finish</li></ul></div></div>
+      </section>
+
+      <section class="section reference" id="references">
+        <header class="section-head"><h2>The source<br>material.</h2><p class="section-intro">These images guide the color, framing and feeling. They are inspiration, not final product photography.</p></header>
+        <div class="reference-grid">
+          <figure><img src="./bluvana-references/0e4c92e7d9a96218200933d104ae6bc2.jpg" alt="Mediterranean palette reference"><figcaption>Riviera palette</figcaption></figure>
+          <figure><img src="./bluvana-references/8daf79c475c2fae7fe40fdae39a9920b.jpg" alt="Olive walnut ivory material palette"><figcaption>Material warmth</figcaption></figure>
+          <figure><img src="./bluvana-references/9dc54baac4bf70bcea55de0dd38d997d.jpg" alt="Saturated green editorial portrait"><figcaption>Expressive movement</figcaption></figure>
+          <figure><img src="./bluvana-references/4632555d8c3c8a2b9106785613d169d7.jpg" alt="Warm lifestyle branding reference"><figcaption>Human scale</figcaption></figure>
+          <figure><img src="./bluvana-references/e109d6527b078b2fd13cd88da3051029.jpg" alt="Soft focus landscape identity"><figcaption>Soft focus atmosphere</figcaption></figure>
+          <figure><img src="./bluvana-references/4b6057d05df1f7fe6ff9557ecda8706d.jpg" alt="Blue modular campaign"><figcaption>Modular campaign rhythm</figcaption></figure>
+          <figure><img src="./bluvana-references/93a33860e7ffc3681166776aa2f5ce94.jpg" alt="Bathroom in pastel tile and brass"><figcaption>Color through architecture</figcaption></figure>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer><img class="brand-logo footer-logo" src="./bluvana-logos/bluvana-wordmark-on-dark-cropped.png" alt="Bluvana"><p>Edit the colors and copy. Export the tokens when they feel right.</p></footer>
+  <div class="toast" role="status" aria-live="polite">Tokens copied</div>
+
+  <script>
+    const defaults = { blue: '#1f5661', green: '#294536', gold: '#e6b864' };
+    const paletteVersion = '2';
+    if (localStorage.getItem('bluvana-palette-version') !== paletteVersion) {
+      ['blue', 'green', 'orange', 'gold'].forEach(name => localStorage.removeItem(`bluvana-${name}`));
+      localStorage.setItem('bluvana-palette-version', paletteVersion);
+    }
+    const inputs = [...document.querySelectorAll('[data-token]')];
+    const toast = document.querySelector('.toast');
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+    function setToken(name, value) {
+      document.documentElement.style.setProperty(`--${name}`, value);
+      const input = document.querySelector(`[data-token="${name}"]`);
+      input.value = value;
+      input.nextElementSibling.textContent = value.toUpperCase();
+      localStorage.setItem(`bluvana-${name}`, value);
+    }
+    function currentTokens() {
+      return Object.fromEntries(inputs.map(input => [input.dataset.token, input.value]));
+    }
+    function cssTokens() {
+      return `:root {\n${Object.entries(currentTokens()).map(([key, value]) => `  --${key}: ${value};`).join('\n')}\n}`;
+    }
+    inputs.forEach(input => {
+      setToken(input.dataset.token, localStorage.getItem(`bluvana-${input.dataset.token}`) || input.value);
+      input.addEventListener('input', event => setToken(event.target.dataset.token, event.target.value));
+    });
+    document.querySelector('#copyTokens').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(cssTokens()); showToast('CSS tokens copied'); }
+      catch { showToast('Copy unavailable in this browser'); }
+    });
+    document.querySelector('#downloadTokens').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify({ brand: 'Bluvana', colors: currentTokens() }, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'bluvana-color-tokens.json';
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast('JSON downloaded');
+    });
+    document.querySelector('#resetColors').addEventListener('click', () => {
+      Object.entries(defaults).forEach(([key, value]) => setToken(key, value));
+      showToast('Original palette restored');
+    });
+    const links = [...document.querySelectorAll('.nav a')];
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) links.forEach(link => link.classList.toggle('active', link.hash === `#${entry.target.id}`));
+      });
+    }, { rootMargin: '-20% 0px -72% 0px' });
+    links.forEach(link => {
+      const section = document.querySelector(link.hash);
+      if (section) observer.observe(section);
+    });
+  </script>
+</body>
+</html>

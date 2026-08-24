@@ -1,0 +1,10 @@
+{
+  "approved": true,
+  "approval": "Delegated by the user in the original brief: proceed end to end and make design decisions without intermediate pauses.",
+  "model": "openai/gpt-image-2-developer/text-to-image",
+  "quality": "low",
+  "size": "1536x1024",
+  "predictionId": "1fe82668e13a40b29c5c1206edf5e18f",
+  "promptFile": "comp-a-prompt.txt"
+}
+

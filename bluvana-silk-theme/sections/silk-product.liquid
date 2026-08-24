@@ -1,0 +1,312 @@
+{{ 'silk-product.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'silk-product.js' | asset_url }}" defer="defer"></script>
+
+{% liquid
+  assign p = product
+  assign v = product.selected_or_first_available_variant
+  assign media = product.media
+  assign on_sale = false
+  if v.compare_at_price > v.price
+    assign on_sale = true
+  endif
+%}
+
+<div class="sk-pdp" data-sk-pdp>
+  <section class="sk-pdp__hero">
+    {%- comment -%} ---------- gallery ---------- {%- endcomment -%}
+    <div class="sk-gal" data-sk-gal>
+      <ul class="sk-gal__thumbs">
+        {%- if media.size > 0 -%}
+          {%- for m in media limit: 8 -%}
+            <li>
+              <button
+                class="sk-gal__thumb"
+                type="button"
+                data-sk-thumb
+                data-src="{{ m | image_url: width: 1400 }}"
+                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-label="View image {{ forloop.index }}"
+              >
+                <img src="{{ m | image_url: width: 200 }}" alt="" width="76" height="95" loading="lazy">
+              </button>
+            </li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+
+      {%- assign ar = media[0].preview_image.aspect_ratio | default: 0.8 -%}
+      <div class="sk-gal__stage" data-sk-stage-box style="--ar: {{ ar }}">
+
+        {%- if media.size > 1 -%}
+          <button class="sk-gal__nav sk-gal__nav--prev" type="button" data-sk-gal-prev aria-label="Previous image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+          </button>
+          <button class="sk-gal__nav sk-gal__nav--next" type="button" data-sk-gal-next aria-label="Next image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        {%- endif -%}
+        {%- if media.size > 0 -%}
+          <img
+            data-sk-stage
+            src="{{ media[0] | image_url: width: 1400 }}"
+            alt="{{ p.featured_media.alt | default: p.title | escape }}"
+            width="900"
+            height="1125"
+            fetchpriority="high"
+          >
+        {%- else -%}
+          {% render 'silk-placeholder',
+            tone: 'paper',
+            label: p.title,
+            note: 'Product photography goes here. Shoot on the same seamless, same light and same distance as the rest of the catalog so the grid stays consistent.'
+          %}
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} ---------- buy box ---------- {%- endcomment -%}
+    <div class="sk-buy">
+      <h1 class="sk-disp sk-buy__title">{{ p.title }}</h1>
+
+      <a class="sk-buy__rate" href="#reviews" data-sk-jump>
+        <span class="sk-stars" data-sk-hero-stars aria-hidden="true">
+          {%- for i in (1..5) -%}
+            <svg viewBox="0 0 20 20"><path d="M10 1.5l2.5 5.4 5.9.7-4.4 4 1.2 5.9L10 14.6 4.8 17.5 6 11.6 1.6 7.6l5.9-.7z"/></svg>
+          {%- endfor -%}
+        </span>
+        <span data-sk-hero-count>Read reviews</span>
+      </a>
+
+      <div class="sk-buy__price">
+        <span data-sk-price>{{ v.price | money }}</span>
+        {%- if on_sale -%}
+          <s class="sk-buy__was" data-sk-was>{{ v.compare_at_price | money }}</s>
+          {%- assign pct = v.compare_at_price | minus: v.price | times: 100.0 | divided_by: v.compare_at_price | round -%}
+          <span class="sk-buy__save">Save {{ pct }}%</span>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.lede != blank -%}
+        <p class="sk-buy__lede">{{ section.settings.lede }}</p>
+      {%- endif -%}
+
+      {% form 'product', p, id: 'sk-product-form', novalidate: 'novalidate' %}
+        <input type="hidden" name="id" value="{{ v.id }}" data-sk-variant-id>
+
+        {%- for option in p.options_with_values -%}
+          {%- assign oname = option.name | downcase -%}
+          {%- assign is_color = false -%}
+          {%- if oname contains 'color' or oname contains 'colour' -%}
+            {%- assign is_color = true -%}
+          {%- endif -%}
+          {%- assign is_size = false -%}
+          {%- if oname contains 'size' -%}
+            {%- assign is_size = true -%}
+          {%- endif -%}
+
+          <fieldset class="sk-opt" data-sk-opt data-index="{{ forloop.index0 }}">
+            <div class="sk-opt__head">
+              <span class="sk-opt__name">{{ option.name }}</span>
+              {%- if is_size and section.settings.show_size_chart -%}
+                <button class="sk-opt__link" type="button" data-sk-size-open>Size chart</button>
+              {%- else -%}
+                <span class="sk-opt__value">
+                  <span data-sk-opt-value>{{ option.selected_value }}</span>
+                  <span class="sk-out-chip" data-sk-out-chip {% if v.available %}hidden{% endif %}>Sold out</span>
+                </span>
+              {%- endif -%}
+            </div>
+
+            <div class="sk-opt__row">
+          {%- assign ck = 'black|ink|charcoal|graphite|white|ivory|cream|bone|champagne|nude|beige|taupe|blush|pink|rose|dusty rose|mauve|red|rouge|wine|burgundy|merlot|green|pine|sage|emerald|forest|olive|blue|navy|sky|light blue|powder blue|teal|purple|plum|lilac|lavender|grey|gray|silver|slate|mocha|chocolate|brown|espresso|gold|bronze' | split: '|' -%}
+          {%- assign cv = '#1a1817|#111010|#2a2725|#3a3734|#f7f5f2|#e8e3dc|#ece5d8|#dcd6d0|#e3cfb4|#d8c3ac|#ddcdb6|#a4978a|#e8c4c0|#e5b7bd|#d99aa4|#cf9aa2|#b99098|#a81b34|#a81b34|#7e1428|#6d1526|#5d1220|#25473a|#25473a|#9caf9f|#1f5f4a|#1e4032|#5a5f3e|#2d3d5c|#23324e|#b9d3ea|#b9d3ea|#c6dcee|#29565c|#5b3a6b|#6b3f57|#b9a6c9|#c3b2d2|#9a9691|#9a9691|#c7c4bf|#6f757a|#4a352c|#43302a|#5b4235|#3a2b23|#c9a961|#96703c' | split: '|' -%}
+              {%- for value in option.values -%}
+                {%- assign vid = 'opt-' | append: forloop.parentloop.index | append: '-' | append: forloop.index -%}
+                {%- assign vname = value | downcase | strip -%}
+                {%- assign hex = '' -%}
+                {%- for k in ck -%}
+                  {%- if k == vname -%}
+                    {%- assign hex = cv[forloop.index0] -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if hex == blank -%}
+                  {%- for k in ck -%}
+                    {%- if vname contains k -%}
+                      {%- assign hex = cv[forloop.index0] -%}
+                      {%- break -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+                {%- if hex == blank -%}
+                  {%- assign hex = '#d9d3cf' -%}
+                {%- endif -%}
+                <input
+                  type="radio"
+                  id="{{ vid }}"
+                  name="option-{{ forloop.parentloop.index0 }}"
+                  value="{{ value | escape }}"
+                  data-sk-radio
+                  {% if value == option.selected_value %}checked{% endif %}
+                >
+                {%- if is_color -%}
+                  {%- capture sw_style -%}
+                    {%- if value.swatch.image != blank -%}
+                      background-image:url({{ value.swatch.image | image_url: width: 96 }});background-size:cover;background-position:center
+                    {%- elsif value.swatch.color != blank -%}
+                      background:{{ value.swatch.color }}
+                    {%- else -%}
+                      background:{{ hex }}
+                    {%- endif -%}
+                  {%- endcapture -%}
+                  <label class="sk-swatch" for="{{ vid }}" title="{{ value | escape }}" style="{{ sw_style | strip }}"></label>
+                {%- else -%}
+                  <label class="sk-size" for="{{ vid }}">{{ value }}</label>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </fieldset>
+        {%- endfor -%}
+
+        <div class="sk-buy__cart">
+          <div class="sk-qty">
+            <button type="button" data-sk-qty="-1" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" name="quantity" value="1" min="1" inputmode="numeric" aria-label="Quantity">
+            <button type="button" data-sk-qty="1" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="sk-btn sk-btn--caps sk-buy__atc" type="submit" data-sk-atc {% unless v.available %}disabled{% endunless %}>
+            <span data-sk-atc-label>{% if v.available %}Add to bag{% else %}Sold out{% endif %}</span>
+          </button>
+        </div>
+      {% endform %}
+
+      {%- comment -%} back in stock: creates a real customer tagged with the item {%- endcomment -%}
+      <div class="sk-notify" data-sk-notify {% if v.available %}hidden{% endif %}>
+        <p class="sk-notify__t">Sold out in <span data-sk-notify-what>{{ v.title }}</span>. Want it back?</p>
+        {% form 'customer', class: 'sk-notify__form', id: 'sk-notify-form' %}
+          <input type="hidden" name="contact[tags]" value="back-in-stock" data-sk-notify-tags>
+          <input type="hidden" name="contact[first_name]" value="Back in stock" data-sk-notify-name>
+          <input type="hidden" name="contact[last_name]" value="{{ p.title }}" data-sk-notify-item>
+          <label class="sk-visually-hidden" for="sk-notify-email">Email address</label>
+          <input id="sk-notify-email" type="email" name="contact[email]" placeholder="Email me when it is back" required autocomplete="email">
+          <button class="sk-btn sk-btn--caps" type="submit">Notify me</button>
+          {%- if form.posted_successfully? -%}
+            <p class="sk-notify__ok">Thank you. We will email you the moment it lands.</p>
+          {%- endif -%}
+        {% endform %}
+        <p class="sk-notify__note">{{ section.settings.notify_note | default: 'One email, only about this piece. No newsletter unless you ask.' }}</p>
+      </div>
+
+      <ul class="sk-buy__assure">
+        {%- capture a1 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 7.5h10v9h-10z"/><path d="M12.5 11h4l3 3v2.5h-7z"/><circle cx="7" cy="18.5" r="2"/><circle cx="16.5" cy="18.5" r="2"/></svg>{%- endcapture -%}
+        {%- capture a2 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 1 2.6 6.1"/><path d="M3.5 6.5v5h5"/></svg>{%- endcapture -%}
+        {%- capture a3 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 20 8v8l-8 4.5L4 16V8z"/><path d="M4 8l8 4.5L20 8M12 12.5V20.5"/></svg>{%- endcapture -%}
+        {%- capture a4 -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>{%- endcapture -%}
+        {%- assign aicons = a1 | append: '||' | append: a2 | append: '||' | append: a3 | append: '||' | append: a4 | split: '||' -%}
+        {%- assign arows = section.settings.assurances | default: 'Free shipping|Over $59§30 day returns|Unworn, in the box§Ships in 1 day|From our US warehouse' | split: '§' -%}
+        {%- for a in arows -%}
+          {%- assign ap = a | split: '|' -%}
+          <li>
+            <span class="sk-buy__aico">{{ aicons[forloop.index0] }}</span>
+            <b>{{ ap[0] | strip }}</b>
+            <span>{{ ap[1] | strip }}</span>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {%- comment -%} ---------- accordions ---------- {%- endcomment -%}
+      <div class="sk-acc2">
+        {%- assign panels = 'Description|Size and fit|Care|Shipping and returns' | split: '|' -%}
+        {%- for panel in panels -%}
+          {%- assign i = forloop.index -%}
+          <div class="sk-acc2__item">
+            <button class="sk-acc2__btn" type="button" data-sk-acc2 aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+              {{ panel }}
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>
+            </button>
+            <div class="sk-acc2__body">
+              <div>
+                {%- case i -%}
+                  {%- when 1 -%}
+                    {%- if p.description != blank -%}
+                      {{ p.description }}
+                    {%- else -%}
+                      <p>{{ section.settings.fallback_desc | default: 'Cut from heavyweight mulberry silk with French seams and a matched dye lot, so it hangs away from the body instead of clinging to it.' }}</p>
+                    {%- endif -%}
+                  {%- when 2 -%}
+                    <p>{{ section.settings.fit_text | default: 'Relaxed through the body. If you are between sizes, take the smaller one; the silk has more give than it looks.' }}</p>
+                  {%- when 3 -%}
+                    <p>{{ section.settings.care_text | default: 'Machine wash cold on a gentle cycle. Line dry in the shade. No dry cleaning, no bleach, cool iron on the reverse if needed.' }}</p>
+                  {%- else -%}
+                    <p>{{ section.settings.ship_text | default: 'Free shipping on orders over $100. Ships in one business day. Thirty days to return anything unworn in its original box.' }}</p>
+                {%- endcase -%}
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+</div>
+
+{%- comment -%} ---------- size chart ---------- {%- endcomment -%}
+{%- if section.settings.show_size_chart -%}
+  <div class="sk-modal" data-sk-size-modal aria-hidden="true" role="dialog" aria-modal="true" aria-label="Size chart">
+    <div class="sk-modal__box">
+      <div class="sk-modal__top">
+        <h2 class="sk-disp sk-modal__t">Size chart</h2>
+        <button class="sk-modal__x" type="button" data-sk-size-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="sk-table-wrap">
+        <table class="sk-table">
+          {%- assign rows = section.settings.size_rows | default: 'Size;Bust;Waist;Hip;Length|XS;32;25;35;33|S;34;27;37;33.5|M;36;29;39;34|L;39;32;42;34.5|XL;42;35;45;35' | split: '|' -%}
+          {%- for row in rows -%}
+            {%- assign cells = row | split: ';' -%}
+            <tr>
+              {%- for cell in cells -%}
+                {%- if forloop.parentloop.first -%}
+                  <th>{{ cell | strip }}</th>
+                {%- else -%}
+                  <td>{{ cell | strip }}</td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+          {%- endfor -%}
+        </table>
+      </div>
+      <p class="sk-buy__lede" style="margin-top:18px">
+        {{ section.settings.size_note | default: 'Measurements in inches, taken flat and doubled. Allow half an inch either way.' }}
+      </p>
+    </div>
+  </div>
+{%- endif -%}
+
+<script>window.__skHandle={{ p.handle | json }};window.__skTitle={{ p.title | json }};</script>
+
+<script type="application/json" data-sk-variants>
+  {{ p.variants | json }}
+</script>
+
+{% schema %}
+{
+  "name": "Silk product",
+  "settings": [
+    { "type": "text", "id": "lede", "label": "Short line under the price" },
+    { "type": "text", "id": "notify_note", "label": "Note under the back in stock form" },
+    { "type": "textarea", "id": "assurances", "label": "Assurances (Title|Note, separated by §)", "default": "Free shipping|Over $59§30 day returns|Unworn, in the box§Ships in 1 day|From our US warehouse" },
+
+    { "type": "header", "content": "Accordion copy" },
+    { "type": "textarea", "id": "fallback_desc", "label": "Description fallback" },
+    { "type": "textarea", "id": "fit_text", "label": "Size and fit" },
+    { "type": "textarea", "id": "care_text", "label": "Care" },
+    { "type": "textarea", "id": "ship_text", "label": "Shipping and returns" },
+
+    { "type": "header", "content": "Size chart" },
+    { "type": "checkbox", "id": "show_size_chart", "label": "Show size chart", "default": true },
+    { "type": "textarea", "id": "size_rows", "label": "Rows (cells by ;, rows by |, first row is the header)", "default": "Size;Bust;Waist;Hip;Length|XS;32;25;35;33|S;34;27;37;33.5|M;36;29;39;34|L;39;32;42;34.5|XL;42;35;45;35" },
+    { "type": "text", "id": "size_note", "label": "Note under the table" }
+  ]
+}
+{% endschema %}

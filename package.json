@@ -1,0 +1,19 @@
+{
+  "name": "bluvana-shopify",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bluvana Shopify themes, product automation, brand assets, and commerce research.",
+  "scripts": {
+    "check": "npm run theme:check",
+    "theme:check": "shopify theme check --path ./bluvana-shopify-theme && shopify theme check --path ./bluvana-silk-theme",
+    "theme:dev:home": "cd bluvana-shopify-theme && shopify theme dev --environment bluvana",
+    "theme:dev:silk": "cd bluvana-silk-theme && shopify theme dev --environment bluvana",
+    "shopify:verify": "node scripts/shopify-product.mjs verify",
+    "shopify:locations": "node scripts/shopify-product.mjs locations",
+    "shopify:product": "node scripts/shopify-product.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+

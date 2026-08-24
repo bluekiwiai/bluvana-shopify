@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "bluvana-product",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

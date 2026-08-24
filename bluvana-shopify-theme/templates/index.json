@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "bluvana_home": {
+      "type": "bluvana-home",
+      "settings": {
+        "filter_product": "shower-filter",
+        "cartridge_product": "replacement-cartridges"
+      }
+    }
+  },
+  "order": ["bluvana_home"]
+}

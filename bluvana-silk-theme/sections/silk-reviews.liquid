@@ -1,0 +1,179 @@
+{{ 'silk-reviews.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'silk-reviews.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Reviews. The markup is rendered by JS from a single array, so the data can
+  come from Judge.me, Supabase or Shopify metaobjects without touching design.
+  Until a backend is wired the sample set below keeps the section honest about
+  what it will look like with real content.
+{%- endcomment -%}
+
+<section class="sk-rev" id="reviews" data-sk-reviews
+  data-endpoint="{{ section.settings.api_read | escape }}"
+  data-submit="{{ section.settings.api_write | escape }}"
+  data-product="{{ product.id }}"
+  data-handle="{{ product.handle }}">
+  <div class="sk-rev__in">
+    <div class="sk-head2">
+      <h2 class="sk-disp sk-head2__t">{{ section.settings.title | default: 'What buyers said' }}</h2>
+    </div>
+
+    {%- comment -%} summary {%- endcomment -%}
+    <div class="sk-rev__top">
+      <div class="sk-rev__score">
+        <span class="sk-rev__avg" data-sk-avg>0.0</span>
+        <span class="sk-stars" data-sk-avg-stars aria-hidden="true"></span>
+        <span class="sk-rev__count" data-sk-total>No reviews yet</span>
+      </div>
+
+      <div class="sk-rev__bars" data-sk-bars></div>
+
+      <div>
+        <button class="sk-btn sk-btn--caps" type="button" data-sk-write-open>
+          Write a review
+          <svg class="sk-btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h14"/><path d="m12.5 6 6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    {%- comment -%} write form {%- endcomment -%}
+    <div class="sk-rev__write" data-sk-write hidden>
+      <div class="sk-rev__write-in">
+       <div class="sk-rev__write-pad">
+        <form class="sk-form" data-sk-review-form novalidate>
+          <div class="sk-form__full">
+            <label id="sk-rate-label">Your rating</label>
+            <div class="sk-rate is-lit-5" data-sk-rate role="radiogroup" aria-labelledby="sk-rate-label">
+              {%- for i in (1..5) -%}
+                <input type="radio" name="rating" id="sk-star-{{ i }}" value="{{ i }}" {% if i == 5 %}checked{% endif %}>
+                <label for="sk-star-{{ i }}" aria-label="{{ i }} star{% if i > 1 %}s{% endif %}">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5l2.5 5.4 5.9.7-4.4 4 1.2 5.9L10 14.6 4.8 17.5 6 11.6 1.6 7.6l5.9-.7z"/></svg>
+                </label>
+              {%- endfor -%}
+            </div>
+          </div>
+
+          <div>
+            <label for="sk-r-name">Your name</label>
+            <input id="sk-r-name" name="name" type="text" placeholder="First name and last initial" required>
+          </div>
+
+          <div>
+            <label for="sk-r-email">Email</label>
+            <input id="sk-r-email" name="email" type="email" placeholder="Used to verify your order" required>
+          </div>
+
+          <div class="sk-form__full">
+            <label for="sk-r-title">Headline</label>
+            <input id="sk-r-title" name="title" type="text" placeholder="Sum it up in a few words">
+          </div>
+
+          <div class="sk-form__full">
+            <label for="sk-r-body">Your review</label>
+            <textarea id="sk-r-body" name="body" placeholder="How does it fit, how does it wash, would you buy it again" required></textarea>
+          </div>
+
+          <label class="sk-drop2" data-sk-drop>
+            <input type="file" accept="image/*" multiple data-sk-files>
+            <span>Add photos. Drag them here or click to choose.</span>
+            <span class="sk-drop2__list" data-sk-previews></span>
+          </label>
+
+          <p class="sk-form__note">
+            {{ section.settings.note | default: 'We check your email against our orders. If it matches, your review is marked as a verified purchase. Your email is never published.' }}
+          </p>
+
+          <div class="sk-form__actions">
+            <button class="sk-btn sk-btn--caps" type="submit" data-sk-submit>Submit review</button>
+            <button class="sk-btn sk-btn--light sk-btn--caps" type="button" data-sk-write-close>Cancel</button>
+            <span class="sk-form__msg" data-sk-form-msg hidden></span>
+          </div>
+        </form>
+       </div>
+      </div>
+    </div>
+
+    {%- comment -%} tools {%- endcomment -%}
+    <div class="sk-rev__tools">
+      <div class="sk-seg" role="group" aria-label="Filter reviews">
+        <button class="sk-seg__b" type="button" data-sk-filter="all" aria-pressed="true">
+          All <span class="sk-seg__n" data-sk-n-all>0</span>
+        </button>
+        <button class="sk-seg__b" type="button" data-sk-filter="photos" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4.5 16.5 4.2-4 3.3 3 2.6-2.4 4.9 4.4"/></svg>
+          Photos <span class="sk-seg__n" data-sk-n-photos>0</span>
+        </button>
+        <button class="sk-seg__b" type="button" data-sk-filter="verified" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2 19 6v6c0 4.2-2.9 7.3-7 8.8-4.1-1.5-7-4.6-7-8.8V6z"/><path d="m8.8 11.9 2.2 2.2 4.2-4.4"/></svg>
+          Verified <span class="sk-seg__n" data-sk-n-verified>0</span>
+        </button>
+      </div>
+
+      <div class="sk-drop3" data-sk-drop3>
+        <button class="sk-drop3__btn" type="button" data-sk-drop3-btn aria-expanded="false" aria-haspopup="listbox">
+          <span class="sk-drop3__label">Most recent</span>
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>
+        </button>
+        <ul class="sk-drop3__menu" role="listbox" data-sk-drop3-menu>
+          <li><button type="button" role="option" aria-selected="true" data-sk-sort-opt="recent">Most recent</button></li>
+          <li><button type="button" role="option" aria-selected="false" data-sk-sort-opt="helpful">Highest rated</button></li>
+          <li><button type="button" role="option" aria-selected="false" data-sk-sort-opt="lowest">Lowest rated</button></li>
+          <li><button type="button" role="option" aria-selected="false" data-sk-sort-opt="photos">Photos first</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sk-rev__photos" data-sk-photostrip hidden></div>
+
+    <ul class="sk-rev__list" data-sk-list></ul>
+    <p class="sk-rev__empty" data-sk-empty hidden>No reviews match that filter.</p>
+
+    <div class="sk-rev__more">
+      <button class="sk-btn sk-btn--out sk-btn--caps" type="button" data-sk-loadmore hidden>Load more reviews</button>
+    </div>
+  </div>
+</section>
+
+<div class="sk-light" data-sk-light aria-hidden="true">
+  <button class="sk-light__x" type="button" data-sk-light-close aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
+  <button class="sk-light__nav sk-light__nav--prev" type="button" data-sk-light-prev aria-label="Previous photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+  </button>
+  <img data-sk-light-img src="" alt="" width="1600" height="1600">
+  <button class="sk-light__nav sk-light__nav--next" type="button" data-sk-light-next aria-label="Next photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+  <p class="sk-light__count" data-sk-light-count></p>
+</div>
+
+<script type="application/json" data-sk-review-seed>
+  {{ section.settings.seed | default: '[]' }}
+</script>
+
+{% schema %}
+{
+  "name": "Silk reviews",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "What buyers said" },
+    { "type": "textarea", "id": "note", "label": "Note under the form" },
+
+    { "type": "header", "content": "Backend" },
+    {
+      "type": "text",
+      "id": "api_read",
+      "label": "Read endpoint",
+      "info": "Leave blank to use the sample data below. Point this at Judge.me, Supabase or your own API."
+    },
+    { "type": "text", "id": "api_write", "label": "Submit endpoint" },
+    {
+      "type": "textarea",
+      "id": "seed",
+      "label": "Sample reviews (JSON array)",
+      "info": "Only used when no read endpoint is set."
+    }
+  ],
+  "presets": [{ "name": "Silk reviews" }]
+}
+{% endschema %}

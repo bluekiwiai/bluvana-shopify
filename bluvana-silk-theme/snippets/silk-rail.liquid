@@ -1,0 +1,61 @@
+{%- comment -%}
+  Auto rotating product rail. Items are rendered twice so the loop can wrap
+  seamlessly: when the scroll passes the halfway point the JS jumps back by
+  exactly half the track width, which is invisible because the content repeats.
+  Params: rid, title, collection, link, cta
+{%- endcomment -%}
+
+{%- liquid
+  assign shop_url = routes.all_products_collection_url
+  assign has_products = false
+  if collection != blank and collection.products_count > 0
+    assign has_products = true
+  endif
+-%}
+
+<section class="sk-rail" aria-label="{{ title | escape }}" data-sk-rail data-rail-id="{{ rid }}">
+  <div class="sk-rail__in">
+    <div class="sk-head2">
+      <h2 class="sk-disp sk-head2__t">{{ title }}</h2>
+    </div>
+  </div>
+
+  <div class="sk-rail__viewport">
+    <button class="sk-rail__arrow sk-rail__arrow--prev" type="button" data-sk-rail-prev aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+    </button>
+
+    <div class="sk-rail__track" data-sk-rail-track>
+      {%- for pass in (1..2) -%}
+        {%- if has_products -%}
+          {%- for product in collection.products limit: 15 -%}
+            <div class="sk-rail__cell" {% if pass == 2 %}aria-hidden="true"{% endif %}>
+              {% render 'silk-product-card', product: product %}
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          {%- assign ph = 'Colette Pajama Set;$149;#a81b34,#e8e3dc,#2a2725|Aubade Robe;$129;#e8e3dc,#a81b34,#dcd6d0|Marceau Pajama Set;$155;#2a2725,#111010,#a81b34|Weekend Short Set;$99;#a81b34,#e8e3dc|Nina Camisole Set;$89;#e8e3dc,#dcd6d0,#a81b34|Gabrielle Kimono;$139;#a81b34,#2a2725,#25473a|The Camille Set;$89;#dcd6d0,#a81b34' | split: '|' -%}
+          {%- for row in ph -%}
+            {%- assign p = row | split: ';' -%}
+            <div class="sk-rail__cell" {% if pass == 2 %}aria-hidden="true"{% endif %}>
+              {% render 'silk-product-card', ph_title: p[0], ph_price: p[1], ph_swatches: p[2] %}
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <button class="sk-rail__arrow sk-rail__arrow--next" type="button" data-sk-rail-next aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  {%- if cta != blank -%}
+    <div class="sk-rail__in sk-rail__cta">
+      <a class="sk-btn sk-btn--out sk-btn--caps" href="{{ link | default: shop_url }}">
+        {{ cta }}
+        <svg class="sk-btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h14"/><path d="m12.5 6 6 6-6 6"/></svg>
+      </a>
+    </div>
+  {%- endif -%}
+</section>
