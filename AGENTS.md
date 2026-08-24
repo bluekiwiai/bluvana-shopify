@@ -17,6 +17,7 @@
 - `ad-analysis/`: competitive research and generated ad creative.
 - `creative/product-image-generation/pose-transfers/`: reusable pose-only prompt sets for product-image generation.
 - `.agents/skills/scrape-shein-temu/`: project-local Codex skill for validated SHEIN and Temu product research with browser recovery.
+- `.agents/skills/atlas-cloud-media/`: project-local Codex skill for credential-safe Atlas Cloud image and video generation.
 - Root Markdown, CSV, JPG, and JSON files: product research, source data, audits, and creative prompts.
 
 ## Working agreements
