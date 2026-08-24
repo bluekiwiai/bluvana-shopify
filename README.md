@@ -1,6 +1,6 @@
 # Bluvana Shopify workspace
 
-Private working repository for Bluvana's Shopify storefronts, product operations, brand assets, and ecommerce research.
+Working repository for Bluvana's Shopify storefronts, product operations, brand assets, and ecommerce research. The repository is currently public, so commit only material suitable for public access.
 
 ## What's here
 
@@ -12,6 +12,7 @@ Private working repository for Bluvana's Shopify storefronts, product operations
 | `public/bluvana-*` | Brand system, logos, and visual references |
 | `filter photos/` | Shower-filter product imagery |
 | `ad-analysis/` | Competitive ad analysis and Bluvana creative work |
+| `creative/product-image-generation/pose-transfers/` | Reusable pose-transfer prompt sets for product images |
 | Root research files | Product data, sourcing, GMC audit, prompts, and product-page research |
 
 The original course site, course videos, local caches, and generated archives are intentionally not part of this repository.
@@ -22,7 +23,7 @@ The original course site, course videos, local caches, and generated archives ar
 
 Kyle needs to grant you both:
 
-- collaborator access to the private `bluekiwiai/bluvana-shopify` GitHub repository;
+- collaborator access to `bluekiwiai/bluvana-shopify` if you need to push changes (the repository is public to read);
 - Shopify staff or collaborator access to `em3i5y-qa.myshopify.com`, including Online Store themes, Products, Content/Files, and any app permissions needed for your work.
 
 Accept both invitations before continuing.
@@ -126,4 +127,3 @@ shopify theme check
 ```
 
 Codex behavior in this repository is defined in `AGENTS.md`, following [OpenAI's official AGENTS.md guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
-

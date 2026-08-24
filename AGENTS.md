@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- This is a private shared workspace for Bluvana Shopify themes, product operations, brand assets, product data, and ecommerce research.
+- This is a shared, currently public workspace for Bluvana Shopify themes, product operations, brand assets, product data, and ecommerce research.
 - It is not the course website and it is not a Shopify app repository.
 - The target Shopify store is `em3i5y-qa.myshopify.com`.
 
@@ -15,6 +15,7 @@
 - `public/bluvana-*`: brand system, logos, and visual references.
 - `filter photos/`: shower-filter product imagery.
 - `ad-analysis/`: competitive research and generated ad creative.
+- `creative/product-image-generation/pose-transfers/`: reusable pose-only prompt sets for product-image generation.
 - Root Markdown, CSV, JPG, and JSON files: product research, source data, audits, and creative prompts.
 
 ## Working agreements
@@ -57,4 +58,3 @@
 - Flag hard-coded credentials, customer/order data, and generated result files intended to remain local.
 - Flag edits to store-connected JSON or settings data that could silently overwrite merchant configuration.
 - Flag claims, pricing, compare-at pricing, policy text, or availability messages that are changed without the request clearly supporting them.
-
