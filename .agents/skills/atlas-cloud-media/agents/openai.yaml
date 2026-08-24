@@ -1,0 +1,4 @@
+interface:
+  display_name: "Atlas Cloud Media"
+  short_description: "Generate images and videos with Atlas Cloud"
+  default_prompt: "Use $atlas-cloud-media to generate an image or video with the best current Atlas Cloud model."
